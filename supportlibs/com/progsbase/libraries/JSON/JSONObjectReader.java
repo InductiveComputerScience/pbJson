@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 import static JSON.StringElementMaps.StringElementMaps.GetStringElementMapNumberOfKeys;
-import static JSON.reader.reader.ReadJSON;
+import static JSON.parser.parser.ReadJSON;
 import static references.references.references.CreateStringArrayReferenceLengthValue;
 
 /*
@@ -63,7 +63,7 @@ public class JSONObjectReader {
         return object;
     }
 
-    private static String joinErrorMessages(StringArrayReference errorMessages) {
+    public static String joinErrorMessages(StringArrayReference errorMessages) {
         StringBuilder errorMessage = new StringBuilder();
 
         for (int i = 0; i < errorMessages.stringArray.length; i++) {
@@ -100,7 +100,7 @@ public class JSONObjectReader {
         return jsonReturn;
     }
 
-    private static Object javaifyJSONValue(Element element) {
+    public static Object javaifyJSONValue(Element element) {
         Object o;
 
         o = null;
@@ -124,7 +124,7 @@ public class JSONObjectReader {
         return o;
     }
 
-    private static Object javaifyJSONObject(StringElementMap object) {
+    public static Object javaifyJSONObject(StringElementMap object) {
         Map<String, Object> resultObject = new HashMap<>();
 
         for(int i = 0; i < GetStringElementMapNumberOfKeys(object); i++){
@@ -134,7 +134,7 @@ public class JSONObjectReader {
         return resultObject;
     }
 
-    private static Object javaifyJSONArray(Element[] array) {
+    public static Object javaifyJSONArray(Element[] array) {
         List<Object> resultArray = new ArrayList<>();
 
         for(int i = 0; i < array.length; i++){

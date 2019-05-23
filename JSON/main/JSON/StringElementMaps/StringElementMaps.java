@@ -1,10 +1,10 @@
 package JSON.StringElementMaps;
 
-import JSON.structures.Element;
-import references.references.StringArrayReference;
+import JSON.structures.*;
+import references.references.*;
 
 import static JSON.ElementLists.ElementLists.AddElementRef;
-import static arrays.arrays.arrays.StringsEqual;
+import static arrays.arrays.arrays.*;
 import static lists.StringList.StringList.AddStringRef;
 import static references.references.references.CreateStringReference;
 
@@ -28,9 +28,31 @@ public class StringElementMaps {
         return result;
     }
 
+    public static Element GetObjectValueWithCheck(StringElementMap stringElementMap, char[] key, BooleanReference foundReference) {
+        Element result;
+        double i;
+
+        result = new Element();
+
+        foundReference.booleanValue = false;
+        for(i = 0; i < GetStringElementMapNumberOfKeys(stringElementMap); i = i + 1d){
+            if(StringsEqual(stringElementMap.stringListRef.stringArray[(int)i].string, key)){
+                result = stringElementMap.elementListRef.array[(int)i];
+                foundReference.booleanValue = true;
+            }
+        }
+
+        return result;
+    }
+
     public static void PutStringElementMap(StringElementMap stringElementMap, char[] keystring, Element value) {
         AddStringRef(stringElementMap.stringListRef, CreateStringReference(keystring));
         AddElementRef(stringElementMap.elementListRef, value);
+    }
+
+    public static void SetStringElementMap(StringElementMap stringElementMap, double index, char[] keystring, Element value) {
+        stringElementMap.stringListRef.stringArray[(int)index].string = keystring;
+        stringElementMap.elementListRef.array[(int)index] = value;
     }
 
     public static double GetStringElementMapNumberOfKeys(StringElementMap stringElementMap){

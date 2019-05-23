@@ -5,8 +5,7 @@ import JSON.structures.Element;
 import java.util.List;
 import java.util.Map;
 
-import static JSON.ElementLists.ElementLists.AddElement;
-import static JSON.StringElementMaps.StringElementMaps.PutStringElementMap;
+import static JSON.StringElementMaps.StringElementMaps.SetStringElementMap;
 import static JSON.json.json.*;
 import static JSON.writer.writer.WriteJSON;
 
@@ -58,7 +57,7 @@ public class JSONObjectWriter {
         return stringReturn;
     }
 
-    private static Element unjavaifyJSONValue(Object o) throws JSONException {
+    public static Element unjavaifyJSONValue(Object o) throws JSONException {
         Element e;
 
         if(o == null) {
@@ -100,40 +99,43 @@ public class JSONObjectWriter {
         return e;
     }
 
-    private static Element unjavaifyJSONObject(Object o) throws JSONException {
-        Element e = CreateObjectElement();
-
+    public static Element unjavaifyJSONObject(Object o) throws JSONException {
         Map<String, Object> m = (Map)o;
+        Element e = CreateObjectElement(m.size());
+        int i = 0;
 
         for(Map.Entry<String, Object> p : m.entrySet()){
             Element s = unjavaifyJSONValue(p.getValue());
-            PutStringElementMap(e.object, p.getKey().toCharArray(), s);
+            SetStringElementMap(e.object, i, p.getKey().toCharArray(), s);
+            i++;
         }
 
         return e;
     }
 
-    private static Element unjavaifyJSONArrayList(Object o) throws JSONException {
-        Element e = CreateArrayElement();
-
+    public static Element unjavaifyJSONArrayList(Object o) throws JSONException {
         List<Object> l = (List<Object>)o;
+        Element e = CreateArrayElement(l.size());
+        int i = 0;
 
         for(Object p : l){
             Element s = unjavaifyJSONValue(p);
-            e.array = AddElement(e.array, s);
+            e.array[i] = s;
+            i++;
         }
 
         return e;
     }
 
-    private static Element unjavaifyJSONArrayArray(Object o) throws JSONException {
-        Element e = CreateArrayElement();
-
+    public static Element unjavaifyJSONArrayArray(Object o) throws JSONException {
         Object a[] = (Object[])o;
+        Element e = CreateArrayElement(a.length);
+        int i = 0;
 
         for(Object p : a){
             Element s = unjavaifyJSONValue(p);
-            e.array = AddElement(e.array, s);
+            e.array[i] = s;
+            i++;
         }
 
         return e;

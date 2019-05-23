@@ -1,9 +1,9 @@
 package JSON.tokenTypeEnum;
 
-import JSON.structures.TokenType;
-import references.references.BooleanReference;
+import JSON.structures.*;
+import references.references.*;
 
-import static arrays.arrays.arrays.StringsEqual;
+import static arrays.arrays.arrays.*;
 
 public class tokenTypeEnum {
     public static TokenType GetTokenType(char [] elementTypeName){

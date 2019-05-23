@@ -1,43 +1,54 @@
-package JSON.reader;
+package JSON.parser;
 
-import JSON.TokenLists.TokenArrayReference;
-import JSON.structures.ElementReference;
-import JSON.structures.Token;
-import references.references.NumberReference;
-import JSON.structures.Element;
-import references.references.StringArrayReference;
+import JSON.TokenLists.*;
+import JSON.structures.*;
+import references.references.*;
 
 import static JSON.StringElementMaps.StringElementMaps.*;
-import static JSON.ElementLists.ElementLists.*;
 import static JSON.json.json.*;
 import static JSON.tokenReader.tokenReader.*;
 import static JSON.tokenTypeEnum.tokenTypeEnum.*;
 import static lists.StringList.StringList.*;
 import static nnumbers.StringToNumber.StringToNumber.*;
-import static references.references.references.CreateNumberReference;
-import static references.references.references.CreateStringReference;
+import static references.references.references.*;
 import static strstrings.strings.strings.*;
 
-public class reader {
-    public static boolean ReadJSON(char [] string, ElementReference elementReference, StringArrayReference errorMessages){
+public class parser {
+    public static boolean ReadJSON(char[] string, ElementReference elementReference, StringArrayReference errorMessages) {
         TokenArrayReference tokenArrayReference;
-        NumberReference d;
         boolean success;
 
         // Tokenize.
         tokenArrayReference = new TokenArrayReference();
         success = JSONTokenize(string, tokenArrayReference, errorMessages);
 
-        if(success) {
+        if (success) {
             // Parse.
-            d = CreateNumberReference(0d);
-            success = GetJSONValue(tokenArrayReference.array, d, 0d, elementReference, errorMessages);
+            success = GetJSONValue(tokenArrayReference.array, elementReference, errorMessages);
         }
 
         return success;
     }
 
-    public static boolean GetJSONValue(Token [] tokens, NumberReference i, double depth, ElementReference elementReference, StringArrayReference errorMessages) {
+    public static boolean GetJSONValue(Token [] tokens, ElementReference elementReference, StringArrayReference errorMessages){
+        NumberArrayReference counts;
+        boolean success;
+        NumberReference i;
+
+        i = CreateNumberReference(0d);
+        counts = CreateNumberArrayReferenceLengthValue(tokens.length, 0d);
+
+        success = GetJSONValueWithCheckOption(tokens, i, 0d, elementReference, false, counts, errorMessages);
+
+        if(success){
+            i.numberValue = 0d;
+            GetJSONValueWithCheckOption(tokens, i, 0d, elementReference, true, counts, errorMessages);
+        }
+
+        return success;
+    }
+
+    public static boolean GetJSONValueWithCheckOption(Token [] tokens, NumberReference i, double depth, ElementReference elementReference, boolean add, NumberArrayReference counts, StringArrayReference errorMessages){
         Token token;
         char [] str, substr;
         double stringToDecimalResult;
@@ -47,25 +58,35 @@ public class reader {
         token = tokens[(int)i.numberValue];
 
         if(TokenTypeEnumEquals(token.type.name, "openCurly".toCharArray())){
-            success = GetJSONObject(tokens, i, depth + 1d, elementReference, errorMessages);
+            success = GetJSONObject(tokens, i, depth + 1d, elementReference, add, counts, errorMessages);
         }else if(TokenTypeEnumEquals(token.type.name, "openSquare".toCharArray())){
-            success = GetJSONArray(tokens, i, depth + 1d, elementReference, errorMessages);
+            success = GetJSONArray(tokens, i, depth + 1d, elementReference, add, counts, errorMessages);
         }else if(TokenTypeEnumEquals(token.type.name, "trueValue".toCharArray())){
-            elementReference.element = CreateBooleanElement(true);
+            if(add){
+                elementReference.element = CreateBooleanElement(true);
+            }
             i.numberValue  = i.numberValue + 1d;
         }else if(TokenTypeEnumEquals(token.type.name, "falseValue".toCharArray())){
-            elementReference.element = CreateBooleanElement(false);
+            if(add){
+                elementReference.element = CreateBooleanElement(false);
+            }
             i.numberValue  = i.numberValue + 1d;
         }else if(TokenTypeEnumEquals(token.type.name, "nullValue".toCharArray())){
-            elementReference.element = CreateNullElement();
+            if(add) {
+                elementReference.element = CreateNullElement();
+            }
             i.numberValue  = i.numberValue + 1d;
         }else if(TokenTypeEnumEquals(token.type.name, "number".toCharArray())){
-            stringToDecimalResult = nCreateNumberFromDecimalString(token.value);
-            elementReference.element = CreateNumberElement(stringToDecimalResult);
+            if(add) {
+                stringToDecimalResult = nCreateNumberFromDecimalString(token.value);
+                elementReference.element = CreateNumberElement(stringToDecimalResult);
+            }
             i.numberValue  = i.numberValue + 1d;
         }else if(TokenTypeEnumEquals(token.type.name, "string".toCharArray())){
-            substr = strSubstring(token.value, 1d, token.value.length - 1d);
-            elementReference.element = CreateStringElement(substr);
+            if(add) {
+                substr = strSubstring(token.value, 1d, token.value.length - 1d);
+                elementReference.element = CreateStringElement(substr);
+            }
             i.numberValue  = i.numberValue + 1d;
         }else{
             str = "".toCharArray();
@@ -86,19 +107,24 @@ public class reader {
         return success;
     }
 
-    public static boolean GetJSONObject(Token[] tokens, NumberReference i, double depth, ElementReference elementReference, StringArrayReference errorMessages) {
+    public static boolean GetJSONObject(Token[] tokens, NumberReference i, double depth, ElementReference elementReference, boolean add, NumberArrayReference counts, StringArrayReference errorMessages) {
         Element element, value;
-        boolean done;
+        boolean done, success;
         Token key, colon, comma, closeCurly;
         char [] keystring, str;
         ElementReference valueReference;
-        boolean success;
+        double countIndex, index;
 
-        element = CreateObjectElement();
+        countIndex = i.numberValue;
+        if(add){
+            element = CreateObjectElement(counts.numberArray[(int)countIndex]);
+        }else{
+            element = new Element();
+        }
         valueReference = new ElementReference();
         success = true;
-
         i.numberValue  = i.numberValue + 1d;
+        index = 0d;
 
         if (!TokenTypeEnumEquals(tokens[(int)i.numberValue].type.name, "closeCurly".toCharArray())){
             done = false;
@@ -111,13 +137,17 @@ public class reader {
                     colon = tokens[(int) i.numberValue];
                     if (TokenTypeEnumEquals(colon.type.name, "colon".toCharArray())) {
                         i.numberValue = i.numberValue + 1d;
-                        success = GetJSONValue(tokens, i, depth, valueReference, errorMessages);
+                        success = GetJSONValueWithCheckOption(tokens, i, depth, valueReference, add, counts, errorMessages);
 
                         if (success) {
                             value = valueReference.element;
 
                             keystring = strSubstring(key.value, 1d, key.value.length - 1d);
-                            PutStringElementMap(element.object, keystring, value);
+                            if(add){
+                                SetStringElementMap(element.object, index, keystring, value);
+                            }
+
+                            index = index + 1d;
 
                             comma = tokens[(int) i.numberValue];
                             if (TokenTypeEnumEquals(comma.type.name, "comma".toCharArray())) {
@@ -158,18 +188,27 @@ public class reader {
             }
         }
 
+        counts.numberArray[(int)countIndex] = index;
+
         return success;
     }
 
-    public static boolean GetJSONArray(Token[] tokens, NumberReference i, double depth, ElementReference elementReference, StringArrayReference errorMessages) {
+    public static boolean GetJSONArray(Token[] tokens, NumberReference i, double depth, ElementReference elementReference, boolean add, NumberArrayReference counts, StringArrayReference errorMessages) {
         Element element, value;
         Token nextToken, comma;
         boolean done, success;
         ElementReference valueReference;
+        double countIndex, index;
 
+        index = 0d;
+        countIndex = i.numberValue;
         i.numberValue  = i.numberValue + 1d;
 
-        element = CreateArrayElement();
+        if(add){
+            element = CreateArrayElement(counts.numberArray[(int)countIndex]);
+        }else{
+            element = new Element();
+        }
         valueReference = new ElementReference();
         success = true;
 
@@ -178,12 +217,16 @@ public class reader {
         if(!TokenTypeEnumEquals(nextToken.type.name, "closeSquare".toCharArray())) {
             done = false;
             for (; !done && success; ) {
-                success = GetJSONValue(tokens, i, depth, valueReference, errorMessages);
+                success = GetJSONValueWithCheckOption(tokens, i, depth, valueReference, add, counts, errorMessages);
 
                 if(success){
                     value = valueReference.element;
 
-                    element.array = AddElement(element.array, value);
+                    if(add){
+                        element.array[(int)index] = value;
+                    }
+
+                    index = index + 1d;
 
                     comma = tokens[(int) i.numberValue];
 
@@ -208,6 +251,7 @@ public class reader {
         }
 
         elementReference.element = element;
+        counts.numberArray[(int)countIndex] = index;
 
         return success;
     }

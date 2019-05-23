@@ -4,8 +4,7 @@ import exampleMapper.Example;
 import JSON.structures.Element;
 import references.references.NumberReference;
 
-import static JSON.StringElementMaps.StringElementMaps.PutStringElementMap;
-import static JSON.ElementLists.ElementLists.AddElement;
+import static JSON.StringElementMaps.StringElementMaps.SetStringElementMap;
 import static JSON.json.json.*;
 import static JSON.writer.writer.*;
 import static exampleMapper.exampleMapper.mapTo;
@@ -46,25 +45,43 @@ public class testWriter {
     public static Element createExampleJSON() {
         Element root, innerObject, array;
 
-        root = CreateObjectElement();
+        root = CreateObjectElement(3d);
 
-        innerObject = CreateObjectElement();
+        innerObject = CreateObjectElement(3d);
 
-        PutStringElementMap(innerObject.object, "x1".toCharArray(), CreateNullElement());
-        PutStringElementMap(innerObject.object, "x2".toCharArray(), CreateBooleanElement(true));
-        PutStringElementMap(innerObject.object, "x3".toCharArray(), CreateBooleanElement(false));
+        SetStringElementMap(innerObject.object, 0d, "x1".toCharArray(), CreateNullElement());
+        SetStringElementMap(innerObject.object, 1d, "x2".toCharArray(), CreateBooleanElement(true));
+        SetStringElementMap(innerObject.object, 2d, "x3".toCharArray(), CreateBooleanElement(false));
 
-        array = CreateArrayElement();
-        array.array = AddElement(array.array, CreateNumberElement(1.2));
-        array.array = AddElement(array.array, CreateNumberElement(0.1));
-        array.array = AddElement(array.array, CreateNumberElement(100d));
+        array = CreateArrayElement(3d);
+        array.array[0] = CreateNumberElement(1.2);
+        array.array[1] = CreateNumberElement(0.1);
+        array.array[2] = CreateNumberElement(100d);
 
-        PutStringElementMap(root.object, "a".toCharArray(), CreateStringElement("hei".toCharArray()));
-        PutStringElementMap(root.object, "b".toCharArray(), array);
-        PutStringElementMap(root.object, "x".toCharArray(), innerObject);
+        SetStringElementMap(root.object, 0d, "a".toCharArray(), CreateStringElement("hei".toCharArray()));
+        SetStringElementMap(root.object, 1d, "b".toCharArray(), array);
+        SetStringElementMap(root.object, 2d, "x".toCharArray(), innerObject);
 
         return root;
     }
 
+    public static double testWriterEscape(){
+        char [] string;
+        Element root;
+        NumberReference failures;
 
+        failures = CreateNumberReference(0d);
+
+        root = CreateStringElement("\t\n".toCharArray());
+
+        string = WriteJSON(root);
+
+        AssertEquals(string.length, 6d, failures);
+
+        AssertStringEquals("\"\\t\\n\"".toCharArray(), string, failures);
+
+        DeleteElement(root);
+
+        return failures.numberValue;
+    }
 }

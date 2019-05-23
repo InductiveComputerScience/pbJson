@@ -10,7 +10,7 @@ import static references.references.references.CreateStringReference;
 import static strstrings.strings.strings.*;
 import static testWriter.testWriter.*;
 import static JSON.writer.writer.*;
-import static JSON.reader.reader.*;
+import static JSON.parser.parser.*;
 import static testing.testing.testing.AssertEquals;
 import static testing.testing.testing.AssertTrue;
 

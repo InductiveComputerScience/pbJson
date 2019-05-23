@@ -5,15 +5,12 @@ import JSON.structures.Element;
 import JSON.structures.ElementReference;
 import references.references.StringArrayReference;
 
-import java.lang.reflect.Array;
-import java.lang.reflect.Field;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
+import java.lang.reflect.*;
 import java.util.ArrayList;
 import java.util.List;
 
 import static JSON.StringElementMaps.StringElementMaps.GetStringElementMapNumberOfKeys;
-import static JSON.reader.reader.ReadJSON;
+import static JSON.parser.parser.ReadJSON;
 import static references.references.references.CreateStringArrayReferenceLengthValue;
 
 /*
@@ -28,7 +25,29 @@ import static references.references.references.CreateStringArrayReferenceLengthV
   - Getters and setters not supported.
  */
 public class JSONReflectiveReader {
+    public static <T> boolean readJSON(String json, Reference<T> tReference, Class<T> clazz, StringReference errorMessage) {
+        return readJSON(json, tReference, clazz, null, errorMessage);
+    }
+
+    public static <T> boolean readJSON(String json, Reference<T> tReference, Class<T> clazz, Type genericType, StringReference errorMessage) {
+        boolean success;
+
+        try {
+            tReference.t = readJSON(json, clazz, genericType);
+            success = true;
+        } catch (JSONException e) {
+            success = false;
+            errorMessage.string = e.getMessage();
+        }
+
+        return success;
+    }
+
     public static <T> T readJSON(String json, Class<T> clazz) throws JSONException {
+        return readJSON(json, clazz, null);
+    }
+
+    public static <T> T readJSON(String json, Class<T> clazz, Type genericType) throws JSONException {
         ElementReference elementReference;
         StringArrayReference errorMessages;
         T t;
@@ -40,13 +59,26 @@ public class JSONReflectiveReader {
         boolean success = ReadJSON(json.toCharArray(), elementReference, errorMessages);
 
         if(success){
-            t = javaifyJSONValue(elementReference.element, clazz, null);
+            t = javaifyJSONValue(elementReference.element, clazz, genericType);
+        }else{
+            throw new JSONException(join(errorMessages.stringArray, "\n"));
         }
 
         return t;
     }
 
-    private static <T> T javaifyJSONValue(Element element, Class<T> clazz, Type genericType) throws JSONException {
+    public static String join(references.references.StringReference[] stringArray, String s) {
+        StringBuilder joined = new StringBuilder();
+        for(int i = 0; i < stringArray.length; i++){
+            joined.append(new String(stringArray[i].string));
+            if(i + 1 < stringArray.length) {
+                joined.append(s);
+            }
+        }
+        return joined.toString();
+    }
+
+    public static <T> T javaifyJSONValue(Element element, Class<T> clazz, Type genericType) throws JSONException {
         T t = null;
 
         String type = new String(element.type.name);
@@ -60,6 +92,19 @@ public class JSONReflectiveReader {
             } else if (type.equals("string")) {
                 if(clazz == String.class){
                     t = (T)new String(element.string);
+                }
+                if(clazz.isEnum()){
+                    Method valueOf;
+                    try {
+                        valueOf = clazz.getMethod("valueOf", String.class);
+                    } catch (NoSuchMethodException e) {
+                        throw new JSONException(e.getMessage());
+                    }
+                    try {
+                        t = (T)valueOf.invoke(null, new String(element.string));
+                    } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+                        throw new JSONException(e.getMessage());
+                    }
                 }
             } else if (type.equals("number")) {
                 if(clazz == Double.class || clazz == double.class){
@@ -90,7 +135,7 @@ public class JSONReflectiveReader {
         return t;
     }
 
-    private static <T> T javaifyJSONObject(StringElementMap object, Class<T> clazz) throws JSONException {
+    public static <T> T javaifyJSONObject(StringElementMap object, Class<T> clazz) throws JSONException {
         T t;
 
         try {
@@ -113,7 +158,7 @@ public class JSONReflectiveReader {
         return t;
     }
 
-    private static <T> T javaifyJSONArray(Element[] array, Class<T> clazz, Type genericType) throws JSONException {
+    public static <T> T javaifyJSONArray(Element[] array, Class<T> clazz, Type genericType) throws JSONException {
 
         Class<?> componentType = clazz.getComponentType();
         if(componentType != null){
@@ -127,10 +172,20 @@ public class JSONReflectiveReader {
         }else{
             List<Object> list = new ArrayList<>(array.length);
             ParameterizedType p = (ParameterizedType)genericType;
-            Class<?> typeClass = (Class<?>)p.getActualTypeArguments()[0];
+            Type type = p.getActualTypeArguments()[0];
+            Class<?> typeClass;
+            Type typeGeneric;
+            if(type instanceof Class){
+                typeClass = (Class<?>) type;
+                typeGeneric = null;
+            }else{
+                typeClass = List.class;
+                typeGeneric = type;
+            }
+
 
             for(int i = 0; i < array.length; i++){
-                list.add(javaifyJSONValue(array[i], typeClass, null));
+                list.add(javaifyJSONValue(array[i], typeClass, typeGeneric));
             }
 
             return (T)list;

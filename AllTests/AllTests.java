@@ -1,10 +1,20 @@
+import JSON.structures.ElementReference;
 import com.progsbase.libraries.JSON.*;
 import org.junit.Test;
+import references.references.StringArrayReference;
 
-import static com.progsbase.libraries.JSON.JSONObjectReader.readJSON;
+import java.io.File;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.util.Arrays;
+import java.util.List;
+
 import static com.progsbase.libraries.JSON.JSONObjectReader.readJSONExceptionOnFailure;
 import static com.progsbase.libraries.JSON.JSONObjectReader.readJSONWithCheck;
+import static JSON.parser.parser.ReadJSON;
 import static org.junit.Assert.*;
+import static references.references.references.CreateStringArrayReferenceLengthValue;
 import static tests.tests.test;
 
 public class AllTests {
@@ -17,7 +27,7 @@ public class AllTests {
     public void testJSONReaderJava() throws JSONException {
         String str = "{\"name\":\"base64\",\"version\":\"0.1.0\",\"business namespace\":\"no.inductive.idea10.programs\",\"scientific namespace\":\"computerscience.algorithms.base64\",\"imports\":[],\"imports2\":{},\"development imports\":[[\"\",\"no.inductive.idea10.programs\",\"arrays\",\"0.1.0\"]]}";
 
-        Object o = readJSON(str);
+        Object o = JSONObjectReader.readJSON(str);
         Object o2 = readJSONExceptionOnFailure(str);
         JSONReturn jsonReturn = readJSONWithCheck(str);
     }
@@ -26,7 +36,7 @@ public class AllTests {
     public void testJSONReaderJavaError() {
         String str = "{\"name\":\"base64\",\"version\":\"0.1.0\",\"business namespace\":\"no.inductive.idea10.programs\",\"scientific namespace\":\"computerscience.algorithms.base64\",\"imports\":[],\"imports2\":{},\"development imports\":[[\"\",\"no.inductive.idea10.programs\",\"arrays\",\"0.1.0\"]]";
 
-        Object o = readJSON(str);
+        Object o = JSONObjectReader.readJSON(str);
         assertNull(o);
         boolean threwException = false;
         try {
@@ -61,7 +71,7 @@ public class AllTests {
     public void testJSOWriterJavaObject1(){
         String str = "{\"name\":\"base64\",\"version\":\"0.1.0\",\"business namespace\":\"no.inductive.idea10.programs\",\"scientific namespace\":\"computerscience.algorithms.base64\",\"imports\":[],\"imports2\":{},\"development imports\":[[\"\",\"no.inductive.idea10.programs\",\"arrays\",\"0.1.0\"]]}";
 
-        Object o = readJSON(str);
+        Object o = JSONObjectReader.readJSON(str);
 
         String str2 = JSONObjectWriter.writeJSON(o);
 
@@ -73,7 +83,7 @@ public class AllTests {
     public void testJSOWriterJavaObject2(){
         String str = "{\"a\":\"hei\",\"b\":[1.2,0.1,100],\"x\":{\"x1\":null,\"x2\":true,\"x3\":false}}";
 
-        Object o = readJSON(str);
+        Object o = JSONObjectReader.readJSON(str);
 
         String str2 = JSONObjectWriter.writeJSON(o);
 
@@ -103,5 +113,42 @@ public class AllTests {
 
         System.out.println(str);
         System.out.println(str2);
+    }
+
+    @Test
+    public void testJSONReaderJavaReflective3() throws JSONException {
+        String str = "{\"x\": [[1, 2, 3], [1, 2, 3], [1, 2, 3]]}";
+
+        DList e = JSONReflectiveReader.readJSON(str, DList.class);
+
+        System.out.println(e.x);
+    }
+
+    @Test
+    public void testJSONReaderJavaReflective4() throws JSONException {
+        String str = "[[1.1, 2, 3], [1, 2, 3], [1, 2, 3]]";
+
+        List<List<Double>> e = JSONReflectiveReader.readJSON(str, List.class, new GenericTypeGetter<List<List<Double>>>(){}.getType());
+
+        System.out.println(e);
+    }
+
+    @Test
+    public void testJSONReaderJavaReflectiveEnum() throws JSONException {
+        String str = "{\"a\": \"b\"}";
+
+        ClassWithEnum e = JSONReflectiveReader.readJSON(str, ClassWithEnum.class);
+
+        assertEquals(e.a, TypeA.b);
+    }
+
+    @Test
+    public void testJSONWriterJavaReflectiveEnum() throws JSONException {
+        ClassWithEnum e = new ClassWithEnum();
+        e.a = TypeA.c;
+
+        String s = JSONReflectiveWriter.writeJSON(e);
+
+        assertEquals(s, "{\"a\":\"c\"}");
     }
 }

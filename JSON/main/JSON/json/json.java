@@ -43,22 +43,22 @@ public class json {
         return element;
     }
 
-    public static Element CreateArrayElement(){
+    public static Element CreateArrayElement(double length){
         Element element;
         element = new Element();
         element.type = GetElementType("array".toCharArray());
-        element.array = new Element[0];
+        element.array = new Element[(int)length];
         return element;
     }
 
-    public static Element CreateObjectElement(){
+    public static Element CreateObjectElement(double length){
         Element element;
         element = new Element();
         element.type = GetElementType("object".toCharArray());
         element.object = new StringElementMap();
-        element.object.stringListRef = CreateStringArrayReferenceLengthValue(0d, "".toCharArray());
+        element.object.stringListRef = CreateStringArrayReferenceLengthValue(length, "".toCharArray());
         element.object.elementListRef = new ElementArrayReference();
-        element.object.elementListRef.array = new Element[0];
+        element.object.elementListRef.array = new Element[(int)length];
         return element;
     }
 

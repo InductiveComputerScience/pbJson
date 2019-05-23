@@ -5,8 +5,7 @@ import JSON.structures.Element;
 import java.lang.reflect.Field;
 import java.util.List;
 
-import static JSON.ElementLists.ElementLists.AddElement;
-import static JSON.StringElementMaps.StringElementMaps.PutStringElementMap;
+import static JSON.StringElementMaps.StringElementMaps.SetStringElementMap;
 import static JSON.json.json.*;
 import static JSON.writer.writer.WriteJSON;
 
@@ -21,6 +20,20 @@ import static JSON.writer.writer.WriteJSON;
   - Boolean -> boolean
  */
 public class JSONReflectiveWriter {
+    public static <T> boolean writeJSON(T t, StringReference jsonReference, StringReference errorMessage) {
+        boolean success;
+
+        try {
+            jsonReference.string = writeJSON(t);
+            success = true;
+        } catch (JSONException e) {
+            success = false;
+            errorMessage.string = e.getMessage();
+        }
+
+        return success;
+    }
+
     public static <T> String writeJSON(T t) throws JSONException{
         char[] value;
 
@@ -37,6 +50,8 @@ public class JSONReflectiveWriter {
             e = CreateNullElement();
         }else if(t.getClass().isArray()) {
             e = unjavaifyJSONArrayArray(t);
+        }else if(t.getClass().isEnum()) {
+            e = unjavaifyJSONEnum(t);
         }else if(t instanceof List) {
             e = unjavaifyJSONArrayList(t);
         }else if(t instanceof String) {
@@ -70,10 +85,14 @@ public class JSONReflectiveWriter {
         return e;
     }
 
-    private static <T> Element unjavaifyJSONObject(T t) throws JSONException {
-        Element e = CreateObjectElement();
+    private static <T> Element unjavaifyJSONEnum(T t) {
+        return CreateStringElement(t.toString().toCharArray());
+    }
 
+    public static <T> Element unjavaifyJSONObject(T t) throws JSONException {
         Field[] fields = t.getClass().getFields();
+        Element e = CreateObjectElement(fields.length);
+        int i = 0;
 
         for(Field f : fields){
             Element s;
@@ -82,33 +101,36 @@ public class JSONReflectiveWriter {
             } catch (IllegalAccessException ex) {
                 throw new JSONException(ex.getMessage());
             }
-            PutStringElementMap(e.object, f.getName().toCharArray(), s);
+            SetStringElementMap(e.object, i, f.getName().toCharArray(), s);
+            i++;
         }
 
         return e;
     }
 
-    private static Element unjavaifyJSONArrayList(Object o) throws JSONException {
-        Element e = CreateArrayElement();
-
+    public static Element unjavaifyJSONArrayList(Object o) throws JSONException {
         List<Object> l = (List<Object>)o;
+        Element e = CreateArrayElement(l.size());
+        int i = 0;
 
         for(Object p : l){
             Element s = unjavaifyJSONValue(p);
-            e.array = AddElement(e.array, s);
+            e.array[i] = s;
+            i++;
         }
 
         return e;
     }
 
-    private static Element unjavaifyJSONArrayArray(Object o) throws JSONException {
-        Element e = CreateArrayElement();
-
+    public static Element unjavaifyJSONArrayArray(Object o) throws JSONException {
         Object a[] = (Object[])o;
+        Element e = CreateArrayElement(a.length);
+        int i = 0;
 
         for(Object p : a){
             Element s = unjavaifyJSONValue(p);
-            e.array = AddElement(e.array, s);
+            e.array[i] = s;
+            i++;
         }
 
         return e;

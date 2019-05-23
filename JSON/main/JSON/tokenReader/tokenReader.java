@@ -4,7 +4,6 @@ import JSON.TokenLists.*;
 import JSON.structures.*;
 import references.references.*;
 
-import static JSON.TokenLists.TokenLists.*;
 import static JSON.tokenTypeEnum.tokenTypeEnum.*;
 import static arrays.arrays.arrays.*;
 import static charCharacters.Characters.Characters.*;
@@ -14,9 +13,24 @@ import static references.references.references.*;
 import static strstrings.strings.strings.*;
 
 public class tokenReader {
-    public static boolean JSONTokenize(char[] json, TokenArrayReference tokenArrayReference, StringArrayReference errorMessages) {
+    public static boolean JSONTokenize(char[] string, TokenArrayReference tokenArrayReference, StringArrayReference errorMessages) {
+        NumberReference count;
+        boolean success;
+
+        count = CreateNumberReference(0d);
+        success = JSONTokenizeWithCountOption(string, tokenArrayReference, count, false, errorMessages);
+
+        if(success) {
+            tokenArrayReference.array = new Token[(int) count.numberValue];
+            JSONTokenizeWithCountOption(string, tokenArrayReference, count, true, errorMessages);
+        }
+
+        return success;
+    }
+
+    public static boolean JSONTokenizeWithCountOption(char[] json, TokenArrayReference tokenArrayReference, NumberReference countReference, boolean add, StringArrayReference errorMessages) {
         Token[] tokens;
-        double i;
+        double i, t;
         char c;
         Token numberToken;
         char[] str;
@@ -28,47 +42,94 @@ public class tokenReader {
         success = true;
 
         tokenReference = new TokenReference();
+        countReference.numberValue = 0d;
 
-        tokens = new Token[0];
+        tokens = tokenArrayReference.array;
         stringLength = new NumberReference();
+        t = 0;
 
         for(i = 0; i < json.length && success;) {
             c = json[(int)i];
 
             if (c == '{') {
-                tokens = AddToken(tokens, CreateToken(GetTokenType("openCurly".toCharArray())));
+                if(add){
+                    tokens[(int)t] = CreateToken(GetTokenType("openCurly".toCharArray()));
+                    t = t + 1d;
+                }else{
+                    countReference.numberValue = countReference.numberValue + 1d;
+                }
                 i = i + 1d;
             }else if (c == '}') {
-                tokens = AddToken(tokens, CreateToken(GetTokenType("closeCurly".toCharArray())));
+                if(add){
+                    tokens[(int)t] = CreateToken(GetTokenType("closeCurly".toCharArray()));
+                    t = t + 1d;
+                }else{
+                    countReference.numberValue = countReference.numberValue + 1d;
+                }
                 i = i + 1d;
             }else if (c == '[') {
-                tokens = AddToken(tokens, CreateToken(GetTokenType("openSquare".toCharArray())));
+                if(add) {
+                    tokens[(int)t] = CreateToken(GetTokenType("openSquare".toCharArray()));
+                    t = t + 1d;
+                }else{
+                    countReference.numberValue = countReference.numberValue + 1d;
+                }
                 i = i + 1d;
             }else if (c == ']') {
-                tokens = AddToken(tokens, CreateToken(GetTokenType("closeSquare".toCharArray())));
+                if(add) {
+                    tokens[(int)t] = CreateToken(GetTokenType("closeSquare".toCharArray()));
+                    t = t + 1d;
+                }else{
+                    countReference.numberValue = countReference.numberValue + 1d;
+                }
                 i = i + 1d;
             }else if (c == ':') {
-                tokens = AddToken(tokens, CreateToken(GetTokenType("colon".toCharArray())));
+                if(add) {
+                    tokens[(int)t] = CreateToken(GetTokenType("colon".toCharArray()));
+                    t = t + 1d;
+                }else {
+                    countReference.numberValue = countReference.numberValue + 1d;
+                }
                 i = i + 1d;
             }else if (c == ',') {
-                tokens = AddToken(tokens, CreateToken(GetTokenType("comma".toCharArray())));
+                if(add) {
+                    tokens[(int)t] = CreateToken(GetTokenType("comma".toCharArray()));
+                    t = t + 1d;
+                }else {
+                    countReference.numberValue = countReference.numberValue + 1d;
+                }
                 i = i + 1d;
             }else if (c == 'f') {
                 success = GetJSONPrimitiveName(json, i, errorMessages, "false".toCharArray(), tokenReference);
                 if(success) {
-                    tokens = AddToken(tokens, tokenReference.token);
+                    if(add){
+                        tokens[(int)t] = tokenReference.token;
+                        t = t + 1d;
+                    }else {
+                        countReference.numberValue = countReference.numberValue + 1d;
+                    }
                     i = i + "false".toCharArray().length;
                 }
             }else if (c == 't') {
                 success = GetJSONPrimitiveName(json, i, errorMessages, "true".toCharArray(), tokenReference);
                 if(success) {
-                    tokens = AddToken(tokens, tokenReference.token);
+                    if(add){
+                        tokens[(int)t] = tokenReference.token;
+                        t = t + 1d;
+                    }else {
+                        countReference.numberValue = countReference.numberValue + 1d;
+                    }
                     i = i + "true".toCharArray().length;
                 }
             }else if (c == 'n') {
                 success = GetJSONPrimitiveName(json, i, errorMessages, "null".toCharArray(), tokenReference);
                 if(success) {
-                    tokens = AddToken(tokens, tokenReference.token);
+                    if(add){
+                        tokens[(int)t] = tokenReference.token;
+                        t = t + 1d;
+                    }else{
+                        countReference.numberValue = countReference.numberValue + 1d;
+                    }
                     i = i + "null".toCharArray().length;
                 }
             }else if (c == ' ' || c == '\n' || c == '\t' || c == '\r') {
@@ -78,14 +139,24 @@ public class tokenReader {
                 success = GetJSONString(json, i, tokenReference, stringLength, errorMessages);
                 if(success) {
                     i = i + stringLength.numberValue;
-                    tokens = AddToken(tokens, tokenReference.token);
+                    if(add){
+                        tokens[(int)t] = tokenReference.token;
+                        t = t + 1d;
+                    }else{
+                        countReference.numberValue = countReference.numberValue + 1d;
+                    }
                 }
             }else if (IsJSONNumberCharacter(c)){
                 success = GetJSONNumberToken(json, i, tokenReference, errorMessages);
                 if(success) {
                     numberToken = tokenReference.token;
                     i = i + numberToken.value.length;
-                    tokens = AddToken(tokens, numberToken);
+                    if(add){
+                        tokens[(int)t] = numberToken;
+                        t = t + 1d;
+                    }else{
+                        countReference.numberValue = countReference.numberValue + 1d;
+                    }
                 }
             }else{
                 str = strConcatenateCharacter("Invalid start of Token: ".toCharArray(), c);
@@ -97,7 +168,12 @@ public class tokenReader {
         }
 
         if(success) {
-            tokens = AddToken(tokens, CreateToken(GetTokenType("end".toCharArray())));
+            if(add) {
+                tokens[(int)t] = CreateToken(GetTokenType("end".toCharArray()));
+                t = t + 1d;
+            }else{
+                countReference.numberValue = countReference.numberValue + 1d;
+            }
             tokenArrayReference.array = tokens;
         }
 
