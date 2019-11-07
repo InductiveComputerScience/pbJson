@@ -1,34 +1,34 @@
 package testTokenizer;
 
-import JSON.TokenLists.*;
-import references.references.*;
+import references.references.NumberReference;
+import references.references.StringArrayReference;
+import references.references.StringReference;
 
 import static JSON.tokenReader.tokenReader.*;
-import static references.references.references.*;
-import static strstrings.strings.strings.*;
+import static references.references.references.CreateNumberReference;
+import static references.references.references.CreateStringArrayReferenceLengthValue;
+import static strstrings.strings.strings.strSplitByString;
 import static testing.testing.testing.*;
 
 public class testTokenizer {
-    public static double testTokenizer1(){
-        NumberReference failures, countReference, stringLength;
-        StringArrayReference errorMessages;
-        TokenArrayReference tokenArrayReference;
+    public static void testTokenizer1(NumberReference failures){
+        NumberReference countReference, stringLength;
+        StringArrayReference errorMessages, tokenArrayReference;
         boolean success;
         StringReference[] numbers;
         double i;
 
-        failures = CreateNumberReference(0d);
         countReference = CreateNumberReference(0d);
         stringLength = CreateNumberReference(0d);
         errorMessages = CreateStringArrayReferenceLengthValue(0d, "".toCharArray());
 
-        tokenArrayReference = new TokenArrayReference();
+        tokenArrayReference = new StringArrayReference();
 
         success = JSONTokenize("false".toCharArray(), tokenArrayReference, errorMessages);
         AssertTrue(success, failures);
         if(success) {
-            AssertEquals(tokenArrayReference.array.length, 2d, failures);
-            AssertStringEquals(tokenArrayReference.array[0].type.name, "falseValue".toCharArray(), failures);
+            AssertEquals(tokenArrayReference.stringArray.length, 2d, failures);
+            AssertStringEquals(tokenArrayReference.stringArray[0].string, "false".toCharArray(), failures);
         }
 
         numbers = strSplitByString("11, -1e-1, -0.123456789e-99, 1E1, -0.1E23".toCharArray(), ", ".toCharArray());
@@ -37,8 +37,8 @@ public class testTokenizer {
             success = JSONTokenize(numbers[(int)i].string, tokenArrayReference, errorMessages);
             AssertTrue(success, failures);
             if(success) {
-                AssertEquals(tokenArrayReference.array.length, 2d, failures);
-                AssertStringEquals(tokenArrayReference.array[0].value, numbers[(int)i].string, failures);
+                AssertEquals(tokenArrayReference.stringArray.length, 2d, failures);
+                AssertStringEquals(tokenArrayReference.stringArray[0].string, numbers[(int)i].string, failures);
             }
         }
 
@@ -62,7 +62,5 @@ public class testTokenizer {
 
         success = IsValidJSONString("\"\\uAAAG\"".toCharArray(), errorMessages);
         AssertFalse(success, failures);
-
-        return failures.numberValue;
     }
 }

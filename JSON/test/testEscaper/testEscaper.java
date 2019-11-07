@@ -5,18 +5,15 @@ import references.references.NumberReference;
 import static JSON.writer.writer.JSONEscapeCharacter;
 import static JSON.writer.writer.JSONMustBeEscaped;
 import static references.references.references.CreateNumberReference;
-import static testing.testing.testing.AssertEquals;
-import static testing.testing.testing.AssertStringEquals;
-import static testing.testing.testing.AssertTrue;
+import static testing.testing.testing.*;
 
 public class testEscaper {
-    public static double testEscaper(){
+    public static void testEscaper(NumberReference failures){
         char c;
-        NumberReference letters, failures;
+        NumberReference letters;
         boolean mustBeEscaped;
         char [] escaped;
 
-        failures = CreateNumberReference(0d);
         letters = CreateNumberReference(0d);
 
         c = (char)9d;
@@ -34,7 +31,5 @@ public class testEscaper {
 
         escaped = JSONEscapeCharacter(c);
         AssertStringEquals(escaped, "\\u0000".toCharArray(), failures);
-
-        return failures.numberValue;
     }
 }

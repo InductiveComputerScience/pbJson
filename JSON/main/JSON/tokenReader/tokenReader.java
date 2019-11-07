@@ -1,135 +1,76 @@
 package JSON.tokenReader;
 
-import JSON.TokenLists.*;
-import JSON.structures.*;
+import lists.LinkedListStrings.Structures.*;
 import references.references.*;
 
-import static JSON.tokenTypeEnum.tokenTypeEnum.*;
-import static arrays.arrays.arrays.*;
-import static charCharacters.Characters.Characters.*;
-import static lists.StringList.StringList.*;
-import static nnumbers.StringToNumber.StringToNumber.*;
-import static references.references.references.*;
+import static arrays.arrays.arrays.CreateString;
+import static arrays.arrays.arrays.StringsEqual;
+import static charCharacters.Characters.Characters.charIsNumber;
+import static charCharacters.Characters.Characters.charToUpperCase;
+import static lists.LinkedListStrings.LinkedListStringsFunctions.LinkedListStringsFunctions.*;
+import static lists.LinkedListStrings.LinkedListStringsFunctions.LinkedListStringsFunctions.FreeLinkedListString;
+import static lists.StringList.StringList.AddStringRef;
+import static nnumbers.StringToNumber.StringToNumber.nCharacterIsNumberCharacterInBase;
+import static nnumbers.StringToNumber.StringToNumber.nCreateNumberFromStringWithCheck;
+import static references.references.references.CreateNumberReference;
+import static references.references.references.CreateStringReference;
 import static strstrings.strings.strings.*;
+import static strstrings.strings.strings.strAppendCharacter;
+import static strstrings.strings.strings.strAppendString;
 
 public class tokenReader {
-    public static boolean JSONTokenize(char[] string, TokenArrayReference tokenArrayReference, StringArrayReference errorMessages) {
-        NumberReference count;
-        boolean success;
-
-        count = CreateNumberReference(0d);
-        success = JSONTokenizeWithCountOption(string, tokenArrayReference, count, false, errorMessages);
-
-        if(success) {
-            tokenArrayReference.array = new Token[(int) count.numberValue];
-            JSONTokenizeWithCountOption(string, tokenArrayReference, count, true, errorMessages);
-        }
-
-        return success;
-    }
-
-    public static boolean JSONTokenizeWithCountOption(char[] json, TokenArrayReference tokenArrayReference, NumberReference countReference, boolean add, StringArrayReference errorMessages) {
-        Token[] tokens;
-        double i, t;
+    public static boolean JSONTokenize(char [] json, StringArrayReference tokensReference, StringArrayReference errorMessages) {
+        double i;
         char c;
-        Token numberToken;
         char[] str;
-        StringReference stringReference;
-        TokenReference tokenReference;
+        StringReference stringReference, tokenReference;
         NumberReference stringLength;
         boolean success;
+        LinkedListStrings ll;
 
+        ll = CreateLinkedListString();
         success = true;
 
-        tokenReference = new TokenReference();
-        countReference.numberValue = 0d;
-
-        tokens = tokenArrayReference.array;
         stringLength = new NumberReference();
-        t = 0;
+        tokenReference = new StringReference();
 
         for(i = 0; i < json.length && success;) {
             c = json[(int)i];
 
             if (c == '{') {
-                if(add){
-                    tokens[(int)t] = CreateToken(GetTokenType("openCurly".toCharArray()));
-                    t = t + 1d;
-                }else{
-                    countReference.numberValue = countReference.numberValue + 1d;
-                }
+                LinkedListAddString(ll, "{".toCharArray());
                 i = i + 1d;
             }else if (c == '}') {
-                if(add){
-                    tokens[(int)t] = CreateToken(GetTokenType("closeCurly".toCharArray()));
-                    t = t + 1d;
-                }else{
-                    countReference.numberValue = countReference.numberValue + 1d;
-                }
+                LinkedListAddString(ll, "}".toCharArray());
                 i = i + 1d;
             }else if (c == '[') {
-                if(add) {
-                    tokens[(int)t] = CreateToken(GetTokenType("openSquare".toCharArray()));
-                    t = t + 1d;
-                }else{
-                    countReference.numberValue = countReference.numberValue + 1d;
-                }
+                LinkedListAddString(ll, "[".toCharArray());
                 i = i + 1d;
             }else if (c == ']') {
-                if(add) {
-                    tokens[(int)t] = CreateToken(GetTokenType("closeSquare".toCharArray()));
-                    t = t + 1d;
-                }else{
-                    countReference.numberValue = countReference.numberValue + 1d;
-                }
+                LinkedListAddString(ll, "]".toCharArray());
                 i = i + 1d;
             }else if (c == ':') {
-                if(add) {
-                    tokens[(int)t] = CreateToken(GetTokenType("colon".toCharArray()));
-                    t = t + 1d;
-                }else {
-                    countReference.numberValue = countReference.numberValue + 1d;
-                }
+                LinkedListAddString(ll, ":".toCharArray());
                 i = i + 1d;
             }else if (c == ',') {
-                if(add) {
-                    tokens[(int)t] = CreateToken(GetTokenType("comma".toCharArray()));
-                    t = t + 1d;
-                }else {
-                    countReference.numberValue = countReference.numberValue + 1d;
-                }
+                LinkedListAddString(ll, ",".toCharArray());
                 i = i + 1d;
             }else if (c == 'f') {
                 success = GetJSONPrimitiveName(json, i, errorMessages, "false".toCharArray(), tokenReference);
                 if(success) {
-                    if(add){
-                        tokens[(int)t] = tokenReference.token;
-                        t = t + 1d;
-                    }else {
-                        countReference.numberValue = countReference.numberValue + 1d;
-                    }
+                    LinkedListAddString(ll, "false".toCharArray());
                     i = i + "false".toCharArray().length;
                 }
             }else if (c == 't') {
                 success = GetJSONPrimitiveName(json, i, errorMessages, "true".toCharArray(), tokenReference);
                 if(success) {
-                    if(add){
-                        tokens[(int)t] = tokenReference.token;
-                        t = t + 1d;
-                    }else {
-                        countReference.numberValue = countReference.numberValue + 1d;
-                    }
+                    LinkedListAddString(ll, "true".toCharArray());
                     i = i + "true".toCharArray().length;
                 }
             }else if (c == 'n') {
                 success = GetJSONPrimitiveName(json, i, errorMessages, "null".toCharArray(), tokenReference);
                 if(success) {
-                    if(add){
-                        tokens[(int)t] = tokenReference.token;
-                        t = t + 1d;
-                    }else{
-                        countReference.numberValue = countReference.numberValue + 1d;
-                    }
+                    LinkedListAddString(ll, "null".toCharArray());
                     i = i + "null".toCharArray().length;
                 }
             }else if (c == ' ' || c == '\n' || c == '\t' || c == '\r') {
@@ -138,25 +79,14 @@ public class tokenReader {
             }else if (c == '\"'){
                 success = GetJSONString(json, i, tokenReference, stringLength, errorMessages);
                 if(success) {
+                    LinkedListAddString(ll, tokenReference.string);
                     i = i + stringLength.numberValue;
-                    if(add){
-                        tokens[(int)t] = tokenReference.token;
-                        t = t + 1d;
-                    }else{
-                        countReference.numberValue = countReference.numberValue + 1d;
-                    }
                 }
             }else if (IsJSONNumberCharacter(c)){
                 success = GetJSONNumberToken(json, i, tokenReference, errorMessages);
                 if(success) {
-                    numberToken = tokenReference.token;
-                    i = i + numberToken.value.length;
-                    if(add){
-                        tokens[(int)t] = numberToken;
-                        t = t + 1d;
-                    }else{
-                        countReference.numberValue = countReference.numberValue + 1d;
-                    }
+                    LinkedListAddString(ll, tokenReference.string);
+                    i = i + tokenReference.string.length;
                 }
             }else{
                 str = strConcatenateCharacter("Invalid start of Token: ".toCharArray(), c);
@@ -168,19 +98,15 @@ public class tokenReader {
         }
 
         if(success) {
-            if(add) {
-                tokens[(int)t] = CreateToken(GetTokenType("end".toCharArray()));
-                t = t + 1d;
-            }else{
-                countReference.numberValue = countReference.numberValue + 1d;
-            }
-            tokenArrayReference.array = tokens;
+            LinkedListAddString(ll, "<end>".toCharArray());
+            tokensReference.stringArray = LinkedListStringsToArray(ll);
+            FreeLinkedListString(ll);
         }
 
         return success;
     }
 
-    public static boolean GetJSONNumberToken(char[] json, double start, TokenReference tokenReference, StringArrayReference errorMessages) {
+    public static boolean GetJSONNumberToken(char[] json, double start, StringReference tokenReference, StringArrayReference errorMessages) {
         char c;
         double end, i;
         boolean done, success;
@@ -201,7 +127,7 @@ public class tokenReader {
 
         success = IsValidJSONNumber(numberString, errorMessages);
 
-        tokenReference.token = CreateNumberToken(numberString);
+        tokenReference.string = numberString;
 
         return success;
     }
@@ -381,16 +307,16 @@ public class tokenReader {
         return found;
     }
 
-    public static boolean GetJSONPrimitiveName(char[] string, double start, StringArrayReference errorMessages, char[] primitive, TokenReference tokenReference) {
+    public static boolean GetJSONPrimitiveName(char[] string, double start, StringArrayReference errorMessages, char[] primitive, StringReference tokenReference) {
         char c, p;
-        Token token;
         boolean done, success;
         double i;
-        char [] str;
+        char [] str, token;
 
-        token = new Token();
         done = false;
         success = true;
+
+        token = "".toCharArray();
 
         for(i = start; i < string.length && ((i - start) < primitive.length) && !done; i = i + 1d) {
             c = string[(int)i];
@@ -415,25 +341,25 @@ public class tokenReader {
 
         if(done){
             if(StringsEqual(primitive, "false".toCharArray())) {
-                token = CreateToken(GetTokenType("falseValue".toCharArray()));
+                token = "false".toCharArray();
             }
             if(StringsEqual(primitive, "true".toCharArray())) {
-                token = CreateToken(GetTokenType("trueValue".toCharArray()));
+                token = "true".toCharArray();
             }
             if(StringsEqual(primitive, "null".toCharArray())) {
-                token = CreateToken(GetTokenType("nullValue".toCharArray()));
+                token = "null".toCharArray();
             }
         }else{
             AddStringRef(errorMessages, CreateStringReference("Primitive invalid".toCharArray()));
             success = false;
         }
 
-        tokenReference.token = token;
+        tokenReference.string = token;
 
         return success;
     }
 
-    public static boolean GetJSONString(char [] json, double start, TokenReference tokenReference, NumberReference stringLengthReference, StringArrayReference errorMessages) {
+    public static boolean GetJSONString(char [] json, double start, StringReference tokenReference, NumberReference stringLengthReference, StringArrayReference errorMessages) {
         boolean success, done;
         char [] string, hex;
         NumberReference characterCount, hexReference;
@@ -498,7 +424,7 @@ public class tokenReader {
                 }
             }
 
-            tokenReference.token = CreateStringToken(string);
+            tokenReference.string = string;
             success = true;
         }else{
             AddStringRef(errorMessages, CreateStringReference("End of string was not found.".toCharArray()));
@@ -596,28 +522,5 @@ public class tokenReader {
         }
 
         return isControll;
-    }
-
-    public static Token CreateToken(TokenType tokenType) {
-        Token token;
-        token = new Token();
-        token.type = tokenType;
-        return token;
-    }
-
-    public static Token CreateStringToken(char [] string) {
-        Token token;
-        token = new Token();
-        token.type = GetTokenType("string".toCharArray());
-        token.value = string;
-        return token;
-    }
-
-    public static Token CreateNumberToken(char [] string) {
-        Token token;
-        token = new Token();
-        token.type = GetTokenType("number".toCharArray());
-        token.value = string;
-        return token;
     }
 }

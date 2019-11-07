@@ -4,7 +4,7 @@ import JSON.StringElementMaps.StringElementMap;
 import JSON.structures.Element;
 
 import static JSON.StringElementMaps.StringElementMaps.GetObjectValue;
-import static JSON.elementTypeEnum.elementTypeEnum.ElementTypeEnumEquals;
+import static arrays.arrays.arrays.StringsEqual;
 
 public class exampleMapper {
     public static Example mapTo(Element root) {
@@ -23,7 +23,7 @@ public class exampleMapper {
 
         x = new X();
 
-        if(ElementTypeEnumEquals(GetObjectValue(object, "x1".toCharArray()).type.name, "nullValue".toCharArray())){
+        if(StringsEqual(GetObjectValue(object, "x1".toCharArray()).type, "null".toCharArray())){
             x.x1IsNull = true;
             x.x1 = "".toCharArray();
         }

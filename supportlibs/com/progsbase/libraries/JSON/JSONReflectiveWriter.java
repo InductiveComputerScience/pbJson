@@ -34,7 +34,7 @@ public class JSONReflectiveWriter {
         return success;
     }
 
-    public static <T> String writeJSON(T t) throws JSONException{
+    public static <T> String writeJSON(T t) throws JSONException {
         char[] value;
 
         Element e = unjavaifyJSONValue(t);

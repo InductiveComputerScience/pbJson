@@ -4,12 +4,13 @@ import JSON.StringElementMaps.*;
 import JSON.structures.*;
 import references.references.*;
 
-import static JSON.StringElementMaps.StringElementMaps.*;
-import static JSON.elementTypeEnum.elementTypeEnum.*;
-import static JSON.json.json.*;
-import static JSON.parser.parser.*;
-import static arrays.arrays.arrays.*;
-import static math.math.math.*;
+import static JSON.StringElementMaps.StringElementMaps.GetObjectValueWithCheck;
+import static JSON.StringElementMaps.StringElementMaps.GetStringElementMapKeySet;
+import static JSON.StringElementMaps.StringElementMaps.GetStringElementMapNumberOfKeys;
+import static JSON.json.json.DeleteElement;
+import static JSON.parser.parser.ReadJSON;
+import static arrays.arrays.arrays.StringsEqual;
+import static math.math.math.EpsilonCompare;
 
 public class comparator {
     public static boolean JSONCompare(char [] a, char [] b, double epsilon, BooleanReference equal, StringArrayReference errorMessage){
@@ -45,21 +46,21 @@ public class comparator {
         boolean equal;
         char[] typeName;
 
-        equal = StringsEqual(ea.type.name, eb.type.name);
+        equal = StringsEqual(ea.type, eb.type);
         
         if(equal){
-            typeName = ea.type.name;
-            if(ElementTypeEnumEquals(typeName, "object".toCharArray())){
+            typeName = ea.type;
+            if(StringsEqual(typeName, "object".toCharArray())){
                 equal = JSONCompareObjects(ea.object, eb.object, epsilon);
-            }else if(ElementTypeEnumEquals(typeName, "string".toCharArray())){
+            }else if(StringsEqual(typeName, "string".toCharArray())){
                 equal = StringsEqual(ea.string, eb.string);
-            }else if(ElementTypeEnumEquals(typeName, "array".toCharArray())){
+            }else if(StringsEqual(typeName, "array".toCharArray())){
                 equal = JSONCompareArrays(ea.array, eb.array, epsilon);
-            }else if(ElementTypeEnumEquals(typeName, "number".toCharArray())){
+            }else if(StringsEqual(typeName, "number".toCharArray())){
                 equal = EpsilonCompare(ea.number, eb.number, epsilon);
-            }else if(ElementTypeEnumEquals(typeName, "nullValue".toCharArray())){
+            }else if(StringsEqual(typeName, "null".toCharArray())){
                 equal = true;
-            }else if(ElementTypeEnumEquals(typeName, "booleanValue".toCharArray())){
+            }else if(StringsEqual(typeName, "boolean".toCharArray())){
                 equal = ea.booleanValue == eb.booleanValue;
             }
         }

@@ -1,29 +1,29 @@
 package testReader;
 
-import JSON.structures.*;
-import references.references.*;
+import JSON.structures.Element;
+import JSON.structures.ElementReference;
+import references.references.NumberReference;
+import references.references.StringArrayReference;
+import references.references.StringReference;
 
 import static JSON.StringElementMaps.StringElementMaps.GetObjectValue;
-import static references.references.references.CreateNumberReference;
+import static JSON.parser.parser.ReadJSON;
+import static JSON.writer.writer.WriteJSON;
 import static references.references.references.CreateStringArrayReferenceLengthValue;
 import static references.references.references.CreateStringReference;
-import static strstrings.strings.strings.*;
-import static testWriter.testWriter.*;
-import static JSON.writer.writer.*;
-import static JSON.parser.parser.*;
+import static strstrings.strings.strings.strAppendString;
+import static strstrings.strings.strings.strConcatenateString;
+import static testWriter.testWriter.createExampleJSON;
 import static testing.testing.testing.AssertEquals;
 import static testing.testing.testing.AssertTrue;
 
 public class testReader {
-    public static double testReader(){
-        NumberReference failures;
+    public static void testReader(NumberReference failures){
         Element json;
         char [] string, string2;
         StringArrayReference errorMessages;
         ElementReference elementReference;
         boolean success;
-
-        failures = CreateNumberReference(0d);
 
         json = createExampleJSON();
         string = WriteJSON(json);
@@ -40,19 +40,14 @@ public class testReader {
 
             AssertEquals(string.length, string2.length, failures);
         }
-
-        return failures.numberValue;
     }
 
-    public static double test2(){
-        NumberReference failures;
+    public static void test2(NumberReference failures){
         char [] string, string2;
         StringArrayReference errorMessages;
         Element json;
         ElementReference elementReference;
         boolean success;
-
-        failures = CreateNumberReference(0d);
 
         string = strConcatenateString("{".toCharArray(), "\"name\":\"base64\",".toCharArray());
         string = strAppendString(string, "\"version\":\"0.1.0\",".toCharArray());
@@ -79,11 +74,9 @@ public class testReader {
 
             AssertEquals(string.length, string2.length, failures);
         }
-
-        return failures.numberValue;
     }
 
-    public static double testReaderExample(){
+    public static void testReaderExample(NumberReference failures){
         char [] json;
         StringArrayReference errorMessages;
         ElementReference elementReference;
@@ -96,8 +89,6 @@ public class testReader {
         json = "{\"a\":\"hi\",\"b\":[1.2, 0.1, 100],\"x\":{\"x1\":null,\"x2\":true,\"x3\":false}}".toCharArray();
 
         JSONExample(json, errorMessages, elementReference, outputJSON);
-
-        return 0d;
     }
 
     public static void JSONExample(char[] json, StringArrayReference errorMessages, ElementReference elementReference, StringReference outputJSON) {

@@ -3,12 +3,16 @@ package JSON.writer;
 import JSON.structures.*;
 import references.references.*;
 
-import static JSON.StringElementMaps.StringElementMaps.*;
-import static JSON.elementTypeEnum.elementTypeEnum.*;
-import static JSON.lengthComputer.lengthComputer.*;
-import static java.lang.Math.*;
+import static JSON.StringElementMaps.StringElementMaps.GetObjectValue;
+import static JSON.StringElementMaps.StringElementMaps.GetStringElementMapKeySet;
+import static JSON.lengthComputer.lengthComputer.ComputeJSONStringLength;
+import static arrays.arrays.arrays.StringsEqual;
+import static java.lang.Math.abs;
+import static java.lang.Math.pow;
 import static nnumbers.NumberToString.NumberToString.*;
-import static references.references.references.*;
+import static references.references.references.CreateNumberReference;
+import static strstrings.stream.stream.strWriteCharacterToStingStream;
+import static strstrings.stream.stream.strWriteStringToStingStream;
 
 public class writer {
     public static char[] WriteJSON(Element element) {
@@ -20,17 +24,17 @@ public class writer {
         result = new char[(int)length];
         index = CreateNumberReference(0d);
 
-        if(ElementTypeEnumEquals(element.type.name, "object".toCharArray())){
+        if(StringsEqual(element.type, "object".toCharArray())){
             WriteObject(element, result, index);
-        }else if(ElementTypeEnumEquals(element.type.name, "string".toCharArray())){
+        }else if(StringsEqual(element.type, "string".toCharArray())){
             WriteString(element, result, index);
-        }else if(ElementTypeEnumEquals(element.type.name, "array".toCharArray())){
+        }else if(StringsEqual(element.type, "array".toCharArray())){
             WriteArray(element, result, index);
-        }else if(ElementTypeEnumEquals(element.type.name, "number".toCharArray())){
+        }else if(StringsEqual(element.type, "number".toCharArray())){
             WriteNumber(element, result, index);
-        }else if(ElementTypeEnumEquals(element.type.name, "nullValue".toCharArray())){
-            WriteStringToStingStream(result, index, "null".toCharArray());
-        }else if(ElementTypeEnumEquals(element.type.name, "booleanValue".toCharArray())){
+        }else if(StringsEqual(element.type, "null".toCharArray())){
+            strWriteStringToStingStream(result, index, "null".toCharArray());
+        }else if(StringsEqual(element.type, "boolean".toCharArray())){
             WriteBooleanValue(element, result, index);
         }
 
@@ -40,9 +44,9 @@ public class writer {
     public static void WriteBooleanValue(Element element, char[] result, NumberReference index) {
 
         if(element.booleanValue){
-            WriteStringToStingStream(result, index, "true".toCharArray());
+            strWriteStringToStingStream(result, index, "true".toCharArray());
         }else{
-            WriteStringToStingStream(result, index, "false".toCharArray());
+            strWriteStringToStingStream(result, index, "false".toCharArray());
         }
     }
 
@@ -55,7 +59,7 @@ public class writer {
             numberString = nCreateStringDecimalFromNumber(element.number);
         }
 
-        WriteStringToStingStream(result, index, numberString);
+        strWriteStringToStingStream(result, index, numberString);
 
         // delete(numberString); // TODO: Start using = null instead,
     }
@@ -65,27 +69,27 @@ public class writer {
         Element arrayElement;
         double i;
 
-        WriteStringToStingStream(result, index, "[".toCharArray());
+        strWriteStringToStingStream(result, index, "[".toCharArray());
 
         for(i = 0; i < element.array.length; i = i + 1d){
             arrayElement = element.array[(int)i];
 
             s = WriteJSON(arrayElement);
-            WriteStringToStingStream(result, index, s);
+            strWriteStringToStingStream(result, index, s);
 
             if(i + 1d != element.array.length){
-                WriteStringToStingStream(result, index, ",".toCharArray());
+                strWriteStringToStingStream(result, index, ",".toCharArray());
             }
         }
 
-        WriteStringToStingStream(result, index, "]".toCharArray());
+        strWriteStringToStingStream(result, index, "]".toCharArray());
     }
 
     public static void WriteString(Element element, char[] result, NumberReference index) {
-        WriteStringToStingStream(result, index, "\"".toCharArray());
+        strWriteStringToStingStream(result, index, "\"".toCharArray());
         element.string = JSONEscapeString(element.string);
-        WriteStringToStingStream(result, index, element.string);
-        WriteStringToStingStream(result, index, "\"".toCharArray());
+        strWriteStringToStingStream(result, index, element.string);
+        strWriteStringToStingStream(result, index, "\"".toCharArray());
     }
 
     public static char[] JSONEscapeString(char[] string) {
@@ -102,9 +106,9 @@ public class writer {
         for(i = 0d; i < string.length; i = i + 1d){
             if(JSONMustBeEscaped(string[(int)i], lettersReference)){
                 escaped = JSONEscapeCharacter(string[(int)i]);
-                WriteStringToStingStream(ns, index, escaped);
+                strWriteStringToStingStream(ns, index, escaped);
             }else{
-                WriteCharacterToStingStream(ns, index, string[(int)i]);
+                strWriteCharacterToStingStream(ns, index, string[(int)i]);
             }
         }
 
@@ -240,7 +244,7 @@ public class writer {
         StringArrayReference keys;
         Element objectElement;
 
-        WriteStringToStingStream(result, index, "{".toCharArray());
+        strWriteStringToStingStream(result, index, "{".toCharArray());
 
         keys = GetStringElementMapKeySet(element.object);
         for(i = 0; i < keys.stringArray.length; i = i + 1d){
@@ -248,32 +252,19 @@ public class writer {
             key = JSONEscapeString(key);
             objectElement = GetObjectValue(element.object, key);
 
-            WriteStringToStingStream(result, index, "\"".toCharArray());
-            WriteStringToStingStream(result, index, key);
-            WriteStringToStingStream(result, index, "\"".toCharArray());
-            WriteStringToStingStream(result, index, ":".toCharArray());
+            strWriteStringToStingStream(result, index, "\"".toCharArray());
+            strWriteStringToStingStream(result, index, key);
+            strWriteStringToStingStream(result, index, "\"".toCharArray());
+            strWriteStringToStingStream(result, index, ":".toCharArray());
 
             s = WriteJSON(objectElement);
-            WriteStringToStingStream(result, index, s);
+            strWriteStringToStingStream(result, index, s);
 
             if(i + 1d != keys.stringArray.length){
-                WriteStringToStingStream(result, index, ",".toCharArray());
+                strWriteStringToStingStream(result, index, ",".toCharArray());
             }
         }
 
-        WriteStringToStingStream(result, index, "}".toCharArray());
-    }
-
-    public static void WriteStringToStingStream(char [] stream, NumberReference index, char [] src) {
-        double i;
-        for(i = 0; i < src.length; i = i + 1d){
-            stream[(int)(index.numberValue + i)] = src[(int)i];
-        }
-        index.numberValue = index.numberValue + src.length;
-    }
-
-    public static void WriteCharacterToStingStream(char [] stream, NumberReference index, char src) {
-        stream[(int)(index.numberValue)] = src;
-        index.numberValue = index.numberValue + 1d;
+        strWriteStringToStingStream(result, index, "}".toCharArray());
     }
 }

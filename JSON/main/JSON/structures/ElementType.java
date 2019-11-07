@@ -8,7 +8,7 @@ public class ElementType {
     array,
     string,
     number,
-    booleanValue,
-    nullValue,
+    boolean,
+    null,
      */
 }

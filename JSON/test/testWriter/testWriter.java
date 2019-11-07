@@ -1,24 +1,20 @@
 package testWriter;
 
-import exampleMapper.Example;
 import JSON.structures.Element;
+import exampleMapper.Example;
 import references.references.NumberReference;
 
 import static JSON.StringElementMaps.StringElementMaps.SetStringElementMap;
 import static JSON.json.json.*;
-import static JSON.writer.writer.*;
+import static JSON.writer.writer.WriteJSON;
 import static exampleMapper.exampleMapper.mapTo;
-import static references.references.references.CreateNumberReference;
 import static testing.testing.testing.*;
 
 public class testWriter {
-    public static double testWriter(){
+    public static void testWriter(NumberReference failures){
         char [] string;
         Element root;
         Example example;
-        NumberReference failures;
-
-        failures = CreateNumberReference(0d);
 
         root = createExampleJSON();
 
@@ -38,8 +34,6 @@ public class testWriter {
         AssertEquals(100d, example.b[2], failures);
 
         DeleteElement(root);
-
-        return failures.numberValue;
     }
 
     public static Element createExampleJSON() {
@@ -65,12 +59,9 @@ public class testWriter {
         return root;
     }
 
-    public static double testWriterEscape(){
+    public static void testWriterEscape(NumberReference failures){
         char [] string;
         Element root;
-        NumberReference failures;
-
-        failures = CreateNumberReference(0d);
 
         root = CreateStringElement("\t\n".toCharArray());
 
@@ -81,7 +72,5 @@ public class testWriter {
         AssertStringEquals("\"\\t\\n\"".toCharArray(), string, failures);
 
         DeleteElement(root);
-
-        return failures.numberValue;
     }
 }

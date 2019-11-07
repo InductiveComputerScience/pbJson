@@ -5,9 +5,10 @@ import references.references.StringArrayReference;
 
 import static JSON.StringElementMaps.StringElementMaps.GetObjectValue;
 import static JSON.StringElementMaps.StringElementMaps.GetStringElementMapKeySet;
-import static JSON.elementTypeEnum.elementTypeEnum.ElementTypeEnumEquals;
 import static JSON.writer.writer.JSONEscapedStringLength;
-import static java.lang.Math.*;
+import static arrays.arrays.arrays.StringsEqual;
+import static java.lang.Math.abs;
+import static java.lang.Math.pow;
 import static nnumbers.NumberToString.NumberToString.nCreateStringDecimalFromNumber;
 import static nnumbers.NumberToString.NumberToString.nCreateStringScientificNotationDecimalFromNumber;
 
@@ -17,17 +18,17 @@ public class lengthComputer {
 
         result = 0d;
 
-        if(ElementTypeEnumEquals(element.type.name, "object".toCharArray())){
+        if(StringsEqual(element.type, "object".toCharArray())){
             result = result + ComputeJSONObjectStringLength(element);
-        }else if(ElementTypeEnumEquals(element.type.name, "string".toCharArray())){
+        }else if(StringsEqual(element.type, "string".toCharArray())){
             result = JSONEscapedStringLength(element.string) + 2d;
-        }else if(ElementTypeEnumEquals(element.type.name, "array".toCharArray())){
+        }else if(StringsEqual(element.type, "array".toCharArray())){
             result = result + ComputeJSONArrayStringLength(element);
-        }else if(ElementTypeEnumEquals(element.type.name, "number".toCharArray())){
-            result = result + ComputerJSONNumberStringLength(element);
-        }else if(ElementTypeEnumEquals(element.type.name, "nullValue".toCharArray())){
+        }else if(StringsEqual(element.type, "number".toCharArray())){
+            result = result + ComputeJSONNumberStringLength(element);
+        }else if(StringsEqual(element.type, "null".toCharArray())){
             result = result + "null".toCharArray().length;
-        }else if(ElementTypeEnumEquals(element.type.name, "booleanValue".toCharArray())){
+        }else if(StringsEqual(element.type, "boolean".toCharArray())){
             result = result + ComputeJSONBooleanStringLength(element);
         }
 
@@ -46,13 +47,16 @@ public class lengthComputer {
         return result;
     }
 
-    public static double ComputerJSONNumberStringLength(Element element) {
+    public static double ComputeJSONNumberStringLength(Element element) {
         double length;
+        char[] a;
 
         if(abs(element.number) >= pow(10d, 15d) || abs(element.number) <= pow(10d, -15d)){
-            length = nCreateStringScientificNotationDecimalFromNumber(element.number).length;
+            a = nCreateStringScientificNotationDecimalFromNumber(element.number);
+            length = a.length;
         }else{
-            length = nCreateStringDecimalFromNumber(element.number).length;
+            a = nCreateStringDecimalFromNumber(element.number);
+            length = a.length;
         }
 
         return length;

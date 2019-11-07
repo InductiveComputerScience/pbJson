@@ -7,15 +7,14 @@ import references.references.StringArrayReference;
 
 import static JSON.StringElementMaps.StringElementMaps.GetStringElementMapKeySet;
 import static JSON.StringElementMaps.StringElementMaps.GetObjectValue;
-import static JSON.elementTypeEnum.elementTypeEnum.ElementTypeEnumEquals;
-import static JSON.elementTypeEnum.elementTypeEnum.GetElementType;
+import static arrays.arrays.arrays.StringsEqual;
 import static references.references.references.CreateStringArrayReferenceLengthValue;
 
 public class json {
     public static Element CreateStringElement(char [] string){
         Element element;
         element = new Element();
-        element.type = GetElementType("string".toCharArray());
+        element.type = "string".toCharArray();
         element.string = string;
         return element;
     }
@@ -23,7 +22,7 @@ public class json {
     public static Element CreateBooleanElement(boolean booleanValue){
         Element element;
         element = new Element();
-        element.type = GetElementType("booleanValue".toCharArray());
+        element.type = "boolean".toCharArray();
         element.booleanValue = booleanValue;
         return element;
     }
@@ -31,14 +30,14 @@ public class json {
     public static Element CreateNullElement(){
         Element element;
         element = new Element();
-        element.type = GetElementType("nullValue".toCharArray());
+        element.type = "null".toCharArray();
         return element;
     }
 
     public static Element CreateNumberElement(double number){
         Element element;
         element = new Element();
-        element.type = GetElementType("number".toCharArray());
+        element.type = "number".toCharArray();
         element.number = number;
         return element;
     }
@@ -46,7 +45,7 @@ public class json {
     public static Element CreateArrayElement(double length){
         Element element;
         element = new Element();
-        element.type = GetElementType("array".toCharArray());
+        element.type = "array".toCharArray();
         element.array = new Element[(int)length];
         return element;
     }
@@ -54,7 +53,7 @@ public class json {
     public static Element CreateObjectElement(double length){
         Element element;
         element = new Element();
-        element.type = GetElementType("object".toCharArray());
+        element.type = "object".toCharArray();
         element.object = new StringElementMap();
         element.object.stringListRef = CreateStringArrayReferenceLengthValue(length, "".toCharArray());
         element.object.elementListRef = new ElementArrayReference();
@@ -63,17 +62,17 @@ public class json {
     }
 
     public static void DeleteElement(Element element) {
-        if(ElementTypeEnumEquals(element.type.name, "object".toCharArray())){
+        if(StringsEqual(element.type, "object".toCharArray())){
             DeleteObject(element);
-        }else if(ElementTypeEnumEquals(element.type.name, "string".toCharArray())){
+        }else if(StringsEqual(element.type, "string".toCharArray())){
             delete(element);
-        }else if(ElementTypeEnumEquals(element.type.name, "array".toCharArray())){
+        }else if(StringsEqual(element.type, "array".toCharArray())){
             DeleteArray(element);
-        }else if(ElementTypeEnumEquals(element.type.name, "number".toCharArray())){
+        }else if(StringsEqual(element.type, "number".toCharArray())){
             delete(element);
-        }else if(ElementTypeEnumEquals(element.type.name, "nullValue".toCharArray())){
+        }else if(StringsEqual(element.type, "null".toCharArray())){
             delete(element);
-        }else if(ElementTypeEnumEquals(element.type.name, "booleanValue".toCharArray())){
+        }else if(StringsEqual(element.type, "boolean".toCharArray())){
             delete(element);
         }else{
         }

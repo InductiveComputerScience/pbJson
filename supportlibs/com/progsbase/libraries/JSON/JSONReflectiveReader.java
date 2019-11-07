@@ -81,9 +81,9 @@ public class JSONReflectiveReader {
     public static <T> T javaifyJSONValue(Element element, Class<T> clazz, Type genericType) throws JSONException {
         T t = null;
 
-        String type = new String(element.type.name);
+        String type = new String(element.type);
 
-        if(type.equals("nullValue")){
+        if(type.equals("null")){
         }else{
             if (type.equals("object")) {
                 t = javaifyJSONObject(element.object, clazz);
@@ -125,7 +125,7 @@ public class JSONReflectiveReader {
                 if(clazz == Byte.class || clazz == byte.class){
                     t = (T)new Byte((byte)Math.round(element.number));
                 }
-            } else if (type.equals("booleanValue")) {
+            } else if (type.equals("boolean")) {
                 if(clazz == Boolean.class || clazz == boolean.class){
                     t = (T)(Boolean)element.booleanValue;
                 }

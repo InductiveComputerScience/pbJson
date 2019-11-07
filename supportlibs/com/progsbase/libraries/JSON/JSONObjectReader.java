@@ -105,7 +105,7 @@ public class JSONObjectReader {
 
         o = null;
 
-        String type = new String(element.type.name);
+        String type = new String(element.type);
 
         if(type.equals("object")){
             o = javaifyJSONObject(element.object);
@@ -115,9 +115,9 @@ public class JSONObjectReader {
             o = new String(element.string);
         }else if(type.equals("number")){
             o = element.number;
-        }else if(type.equals("booleanValue")){
+        }else if(type.equals("boolean")){
             o = element.booleanValue;
-        }else if(type.equals("nullValue")){
+        }else if(type.equals("null")){
             o = null;
         }
 
