@@ -6,7 +6,7 @@
 
     <groupId>com.progsbase.libraries</groupId>
     <artifactId>JSON</artifactId>
-    <version>0.4.0</version>
+    <version>0.4.1-SNAPSHOT</version>
     <name>JSON</name>
     <description>This JSON library is mostly written in progsbase-compatible Java. Progsbase allows writing a program in many languages at once. Thus, the core of this library is avaiable in 12 programming languages through the progsbase tool.</description>
     <url>https://repo.progsbase.com/repoviewer/no.inductive.idea10.programs/JSON/0.3.9/</url>

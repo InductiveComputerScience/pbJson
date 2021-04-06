@@ -51,9 +51,14 @@ public class lengthComputer {
         double length;
         char[] a;
 
-        if(abs(element.number) >= pow(10d, 15d) || abs(element.number) <= pow(10d, -15d)){
-            a = nCreateStringScientificNotationDecimalFromNumber(element.number);
-            length = a.length;
+        if(element.number != 0d) {
+            if(abs(element.number) >= pow(10d, 15d) || abs(element.number) <= pow(10d, -15d)){
+                a = nCreateStringScientificNotationDecimalFromNumber(element.number);
+                length = a.length;
+            }else{
+                a = nCreateStringDecimalFromNumber(element.number);
+                length = a.length;
+            }
         }else{
             a = nCreateStringDecimalFromNumber(element.number);
             length = a.length;

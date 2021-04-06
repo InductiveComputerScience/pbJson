@@ -16,6 +16,7 @@ import static JSON.writer.writer.WriteJSON;
   - T [] -> []
   - Double | Float | Integer | Long | Short | Byte -> number
   - String -> ""
+  - char [] -> ""
   - null -> null
   - Boolean -> boolean
  */
@@ -43,11 +44,14 @@ public class JSONReflectiveWriter {
         return new String(value);
     }
 
-    private static <T> Element unjavaifyJSONValue(T t) throws JSONException {
+    public static <T> Element unjavaifyJSONValue(T t) throws JSONException {
         Element e;
 
         if(t == null) {
             e = CreateNullElement();
+        }else if(t.getClass().isArray() && t.getClass().getComponentType() == char.class) {
+            char [] s = (char[])t;
+            e = CreateStringElement(s);
         }else if(t.getClass().isArray()) {
             e = unjavaifyJSONArrayArray(t);
         }else if(t.getClass().isEnum()) {
@@ -85,7 +89,7 @@ public class JSONReflectiveWriter {
         return e;
     }
 
-    private static <T> Element unjavaifyJSONEnum(T t) {
+    public static <T> Element unjavaifyJSONEnum(T t) {
         return CreateStringElement(t.toString().toCharArray());
     }
 

@@ -93,6 +93,9 @@ public class JSONReflectiveReader {
                 if(clazz == String.class){
                     t = (T)new String(element.string);
                 }
+                if(clazz.isArray() && clazz.getComponentType() == char.class){
+                    t = (T)element.string;
+                }
                 if(clazz.isEnum()){
                     Method valueOf;
                     try {

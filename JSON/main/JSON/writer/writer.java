@@ -53,8 +53,12 @@ public class writer {
     public static void WriteNumber(Element element, char[] result, NumberReference index) {
         char[] numberString;
 
-        if(abs(element.number) >= pow(10d, 15d) || abs(element.number) <= pow(10d, -15d)){
-            numberString = nCreateStringScientificNotationDecimalFromNumber(element.number);
+        if(element.number != 0d) {
+            if (abs(element.number) >= pow(10d, 15d) || abs(element.number) <= pow(10d, -15d)) {
+                numberString = nCreateStringScientificNotationDecimalFromNumber(element.number);
+            } else {
+                numberString = nCreateStringDecimalFromNumber(element.number);
+            }
         }else{
             numberString = nCreateStringDecimalFromNumber(element.number);
         }
