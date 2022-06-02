@@ -3,7 +3,9 @@ package com.progsbase.libraries.JSON;
 import JSON.structures.Element;
 
 import java.lang.reflect.Field;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import static JSON.StringElementMaps.StringElementMaps.SetStringElementMap;
 import static JSON.json.json.*;
@@ -105,7 +107,17 @@ public class JSONReflectiveWriter {
             } catch (IllegalAccessException ex) {
                 throw new JSONException(ex.getMessage());
             }
-            SetStringElementMap(e.object, i, f.getName().toCharArray(), s);
+            String key = f.getName();
+
+            if(key.endsWith("x")){
+                Set<String> kws = new HashSet<>(JSONReflectiveReader.ArrayToListConversion(JSONReflectiveReader.javaKeywords));
+                String newkey = key.substring(0, key.length() - 1);
+                if(kws.contains(newkey)){
+                    key = newkey;
+                }
+            }
+
+            SetStringElementMap(e.object, i, key.toCharArray(), s);
             i++;
         }
 

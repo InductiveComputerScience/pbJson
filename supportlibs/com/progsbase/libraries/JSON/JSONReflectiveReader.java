@@ -6,8 +6,7 @@ import JSON.structures.ElementReference;
 import references.references.StringArrayReference;
 
 import java.lang.reflect.*;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 import static JSON.StringElementMaps.StringElementMaps.GetStringElementMapNumberOfKeys;
 import static JSON.parser.parser.ReadJSON;
@@ -138,6 +137,8 @@ public class JSONReflectiveReader {
         return t;
     }
 
+    public static String [] javaKeywords = new String [] {"abstract", "continue", "for", "new", "switch", "assert", "default", "goto", "package", "synchronized", "boolean", "do", "if", "private", "this", "break", "double", "implements", "protected", "throw", "byte", "else", "import", "public", "throws", "case", "enum", "instanceof", "return", "transient", "catch", "extends", "int", "short", "try", "char", "final", "interface", "static", "void", "class", "finally", "long", "strictfp", "volatile", "const", "float", "native", "super", "while"};
+
     public static <T> T javaifyJSONObject(StringElementMap object, Class<T> clazz) throws JSONException {
         T t;
 
@@ -150,6 +151,13 @@ public class JSONReflectiveReader {
         for(int i = 0; i < GetStringElementMapNumberOfKeys(object); i++){
             try {
                 String key = new String(object.stringListRef.stringArray[i].string);
+
+                Set<String> kws = new HashSet<>(ArrayToListConversion(javaKeywords));
+
+                if(kws.contains(key)){
+                    key = key + "x";
+                }
+
                 Field field = clazz.getField(key);
                 Object value = javaifyJSONValue(object.elementListRef.array[i], field.getType(), field.getGenericType());
                 field.set(t, value);
@@ -159,6 +167,14 @@ public class JSONReflectiveReader {
         }
 
         return t;
+    }
+
+    public static <T> List<T> ArrayToListConversion(T array[]) {
+        List<T> list = new ArrayList<>();
+        for (T t : array) {
+            list.add(t);
+        }
+        return list;
     }
 
     public static <T> T javaifyJSONArray(Element[] array, Class<T> clazz, Type genericType) throws JSONException {

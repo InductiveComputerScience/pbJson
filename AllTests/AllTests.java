@@ -1,20 +1,11 @@
-import JSON.structures.ElementReference;
 import com.progsbase.libraries.JSON.*;
 import org.junit.Test;
-import references.references.StringArrayReference;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.util.Arrays;
 import java.util.List;
 
 import static com.progsbase.libraries.JSON.JSONObjectReader.readJSONExceptionOnFailure;
 import static com.progsbase.libraries.JSON.JSONObjectReader.readJSONWithCheck;
-import static JSON.parser.parser.ReadJSON;
 import static org.junit.Assert.*;
-import static references.references.references.CreateStringArrayReferenceLengthValue;
 import static tests.tests.test;
 
 public class AllTests {
@@ -150,5 +141,17 @@ public class AllTests {
         String s = JSONReflectiveWriter.writeJSON(e);
 
         assertEquals(s, "{\"a\":\"c\"}");
+    }
+
+    @Test
+    public void testAnnotation() throws JSONException {
+        String json1 = "{\"package\":\"nice\"}";
+        ExampleWithReservedKeyword exampleWithReservedKeyword = JSONReflectiveReader.readJSON(json1, ExampleWithReservedKeyword.class);
+
+        assertEquals("nice", exampleWithReservedKeyword.packagex);
+
+        String json2 = JSONReflectiveWriter.writeJSON(exampleWithReservedKeyword);
+
+        assertEquals(json1, json2);
     }
 }
