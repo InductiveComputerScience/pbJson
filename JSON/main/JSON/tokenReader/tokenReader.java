@@ -3,20 +3,13 @@ package JSON.tokenReader;
 import lists.LinkedListStrings.Structures.*;
 import references.references.*;
 
-import static arrays.arrays.arrays.CreateString;
-import static arrays.arrays.arrays.StringsEqual;
-import static charCharacters.Characters.Characters.charIsNumber;
-import static charCharacters.Characters.Characters.charToUpperCase;
+import static arrays.arrays.arrays.*;
+import static charCharacters.Characters.Characters.*;
 import static lists.LinkedListStrings.LinkedListStringsFunctions.LinkedListStringsFunctions.*;
-import static lists.LinkedListStrings.LinkedListStringsFunctions.LinkedListStringsFunctions.FreeLinkedListString;
-import static lists.StringList.StringList.AddStringRef;
-import static nnumbers.StringToNumber.StringToNumber.nCharacterIsNumberCharacterInBase;
-import static nnumbers.StringToNumber.StringToNumber.nCreateNumberFromStringWithCheck;
-import static references.references.references.CreateNumberReference;
-import static references.references.references.CreateStringReference;
+import static lists.StringList.StringList.*;
+import static nnumbers.StringToNumber.StringToNumber.*;
+import static references.references.references.*;
 import static strstrings.strings.strings.*;
-import static strstrings.strings.strings.strAppendCharacter;
-import static strstrings.strings.strings.strAppendString;
 
 public class tokenReader {
     public static boolean JSONTokenize(char [] json, StringArrayReference tokensReference, StringArrayReference errorMessages) {

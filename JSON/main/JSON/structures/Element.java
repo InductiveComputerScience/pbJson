@@ -6,7 +6,7 @@ public class Element {
     public char [] type;
 
     public StringElementMap object;
-    public Element[] array;
+    public Element [] array;
     public char [] string;
     public double number;
     public boolean booleanValue;

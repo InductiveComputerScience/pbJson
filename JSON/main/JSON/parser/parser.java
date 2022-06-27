@@ -6,18 +6,14 @@ import lists.LinkedListStrings.Structures.*;
 import references.references.*;
 
 import static JSON.LinkedListElements.LinkedListElementsFunctions.LinkedListElementsFunctions.*;
-import static JSON.LinkedListElements.LinkedListElementsFunctions.LinkedListElementsFunctions.FreeLinkedListElements;
-import static JSON.LinkedListElements.LinkedListElementsFunctions.LinkedListElementsFunctions.LinkedListElementsToArray;
 import static JSON.json.json.*;
-import static JSON.tokenReader.tokenReader.JSONTokenize;
-import static arrays.arrays.arrays.StringsEqual;
-import static charCharacters.Characters.Characters.charIsNumber;
+import static JSON.tokenReader.tokenReader.*;
+import static arrays.arrays.arrays.*;
+import static charCharacters.Characters.Characters.*;
 import static lists.LinkedListStrings.LinkedListStringsFunctions.LinkedListStringsFunctions.*;
-import static lists.LinkedListStrings.LinkedListStringsFunctions.LinkedListStringsFunctions.FreeLinkedListString;
-import static lists.StringList.StringList.AddStringRef;
-import static nnumbers.StringToNumber.StringToNumber.nCreateNumberFromDecimalString;
-import static references.references.references.CreateNumberReference;
-import static references.references.references.CreateStringReference;
+import static lists.StringList.StringList.*;
+import static nnumbers.StringToNumber.StringToNumber.*;
+import static references.references.references.*;
 import static strstrings.strings.strings.*;
 
 public class parser {
@@ -37,7 +33,7 @@ public class parser {
         return success;
     }
 
-    public static boolean GetJSONValue(StringReference[] tokens, ElementReference elementReference, StringArrayReference errorMessages){
+    public static boolean GetJSONValue(StringReference [] tokens, ElementReference elementReference, StringArrayReference errorMessages){
         NumberReference i;
         boolean success;
 
@@ -47,7 +43,7 @@ public class parser {
         return success;
     }
 
-    public static boolean GetJSONValueRecursive(StringReference[] tokens, NumberReference i, double depth, ElementReference elementReference, StringArrayReference errorMessages){
+    public static boolean GetJSONValueRecursive(StringReference [] tokens, NumberReference i, double depth, ElementReference elementReference, StringArrayReference errorMessages){
         char [] str, substr, token;
         double stringToDecimalResult;
         boolean success;
@@ -95,7 +91,7 @@ public class parser {
         return success;
     }
 
-    public static boolean GetJSONObject(StringReference[] tokens, NumberReference i, double depth, ElementReference elementReference, StringArrayReference errorMessages) {
+    public static boolean GetJSONObject(StringReference [] tokens, NumberReference i, double depth, ElementReference elementReference, StringArrayReference errorMessages) {
         Element element, value;
         boolean done, success;
         char [] key, colon, comma, closeCurly;
@@ -180,7 +176,7 @@ public class parser {
         return success;
     }
 
-    public static boolean GetJSONArray(StringReference[] tokens, NumberReference i, double depth, ElementReference elementReference, StringArrayReference errorMessages) {
+    public static boolean GetJSONArray(StringReference [] tokens, NumberReference i, double depth, ElementReference elementReference, StringArrayReference errorMessages) {
         Element element, value;
         char [] nextToken, comma;
         boolean done, success;

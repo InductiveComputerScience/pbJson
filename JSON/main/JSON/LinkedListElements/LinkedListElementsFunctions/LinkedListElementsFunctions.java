@@ -3,6 +3,7 @@ package JSON.LinkedListElements.LinkedListElementsFunctions;
 import JSON.LinkedListElements.Structures.LinkedListNodeElements;
 import JSON.LinkedListElements.Structures.LinkedListElements;
 import JSON.structures.Element;
+import references.references.StringReference;
 
 public class LinkedListElementsFunctions {
 	public static LinkedListElements CreateLinkedListElements(){

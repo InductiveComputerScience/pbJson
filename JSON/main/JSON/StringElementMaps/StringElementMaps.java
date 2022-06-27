@@ -4,7 +4,7 @@ import JSON.structures.*;
 import references.references.*;
 
 import static JSON.ElementLists.ElementLists.AddElementRef;
-import static arrays.arrays.arrays.StringsEqual;
+import static arrays.arrays.arrays.*;
 import static lists.StringList.StringList.AddStringRef;
 import static references.references.references.CreateStringReference;
 

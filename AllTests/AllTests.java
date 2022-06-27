@@ -44,7 +44,7 @@ public class AllTests {
     public void testJSONReaderJavaReflective() throws JSONException {
         String str = "{\"a\":\"hei\",\"b\":[1.2,0.1,100],\"x\":{\"x1\":null,\"x2\":true,\"x3\":false}}";
 
-        Example e = JSONReflectiveReader.readJSON(str, Example.class);
+        Example e = JSONReflectiveReader.readJSON(str, Example.class, true);
 
         System.out.println(e);
     }
@@ -53,7 +53,7 @@ public class AllTests {
     public void testJSONReaderJavaReflective2() throws JSONException {
         String str = "{\"a\":\"hei\",\"b\":[1.2,0.1,100],\"x\":{\"x1\":null,\"x2\":true,\"x3\":false}}";
 
-        Example2 e = JSONReflectiveReader.readJSON(str, Example2.class);
+        Example2 e = JSONReflectiveReader.readJSON(str, Example2.class, true);
 
         System.out.println(e);
     }
@@ -86,7 +86,7 @@ public class AllTests {
     public void testJSOWriterJavaReflectiveObject1() throws JSONException {
         String str = "{\"a\":\"hei\",\"b\":[1.2,0.1,100],\"x\":{\"x1\":null,\"x2\":true,\"x3\":false}}";
 
-        Example e = JSONReflectiveReader.readJSON(str, Example.class);
+        Example e = JSONReflectiveReader.readJSON(str, Example.class, true);
 
         String str2 = JSONReflectiveWriter.writeJSON(e);
 
@@ -98,7 +98,7 @@ public class AllTests {
     public void testJSOWriterJavaReflectiveObject2() throws JSONException {
         String str = "{\"a\":\"hei\",\"b\":[1.2,0.1,100],\"x\":{\"x1\":null,\"x2\":true,\"x3\":false}}";
 
-        Example2 e = JSONReflectiveReader.readJSON(str, Example2.class);
+        Example2 e = JSONReflectiveReader.readJSON(str, Example2.class, true);
 
         String str2 = JSONReflectiveWriter.writeJSON(e);
 
@@ -110,7 +110,7 @@ public class AllTests {
     public void testJSONReaderJavaReflective3() throws JSONException {
         String str = "{\"x\": [[1, 2, 3], [1, 2, 3], [1, 2, 3]]}";
 
-        DList e = JSONReflectiveReader.readJSON(str, DList.class);
+        DList e = JSONReflectiveReader.readJSON(str, DList.class, true);
 
         System.out.println(e.x);
     }
@@ -119,7 +119,7 @@ public class AllTests {
     public void testJSONReaderJavaReflective4() throws JSONException {
         String str = "[[1.1, 2, 3], [1, 2, 3], [1, 2, 3]]";
 
-        List<List<Double>> e = JSONReflectiveReader.readJSON(str, List.class, new GenericTypeGetter<List<List<Double>>>(){}.getType());
+        List<List<Double>> e = JSONReflectiveReader.readJSON(str, List.class, new GenericTypeGetter<List<List<Double>>>(){}.getType(), true);
 
         System.out.println(e);
     }
@@ -128,7 +128,7 @@ public class AllTests {
     public void testJSONReaderJavaReflectiveEnum() throws JSONException {
         String str = "{\"a\": \"b\"}";
 
-        ClassWithEnum e = JSONReflectiveReader.readJSON(str, ClassWithEnum.class);
+        ClassWithEnum e = JSONReflectiveReader.readJSON(str, ClassWithEnum.class, true);
 
         assertEquals(e.a, TypeA.b);
     }
@@ -146,7 +146,7 @@ public class AllTests {
     @Test
     public void testAnnotation() throws JSONException {
         String json1 = "{\"package\":\"nice\"}";
-        ExampleWithReservedKeyword exampleWithReservedKeyword = JSONReflectiveReader.readJSON(json1, ExampleWithReservedKeyword.class);
+        ExampleWithReservedKeyword exampleWithReservedKeyword = JSONReflectiveReader.readJSON(json1, ExampleWithReservedKeyword.class, true);
 
         assertEquals("nice", exampleWithReservedKeyword.packagex);
 

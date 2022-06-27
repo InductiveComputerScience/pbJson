@@ -7,8 +7,7 @@ import static JSON.StringElementMaps.StringElementMaps.GetObjectValue;
 import static JSON.StringElementMaps.StringElementMaps.GetStringElementMapKeySet;
 import static JSON.writer.writer.JSONEscapedStringLength;
 import static arrays.arrays.arrays.StringsEqual;
-import static java.lang.Math.abs;
-import static java.lang.Math.pow;
+import static java.lang.Math.*;
 import static nnumbers.NumberToString.NumberToString.nCreateStringDecimalFromNumber;
 import static nnumbers.NumberToString.NumberToString.nCreateStringScientificNotationDecimalFromNumber;
 
@@ -52,16 +51,15 @@ public class lengthComputer {
         char[] a;
 
         if(element.number != 0d) {
-            if(abs(element.number) >= pow(10d, 15d) || abs(element.number) <= pow(10d, -15d)){
+            if (abs(element.number) >= pow(10d, 15d) || abs(element.number) <= pow(10d, -15d)) {
                 a = nCreateStringScientificNotationDecimalFromNumber(element.number);
                 length = a.length;
-            }else{
+            } else {
                 a = nCreateStringDecimalFromNumber(element.number);
                 length = a.length;
             }
         }else{
-            a = nCreateStringDecimalFromNumber(element.number);
-            length = a.length;
+            length = 1d;
         }
 
         return length;

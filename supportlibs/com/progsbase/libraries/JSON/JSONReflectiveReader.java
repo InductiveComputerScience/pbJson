@@ -43,10 +43,18 @@ public class JSONReflectiveReader {
     }
 
     public static <T> T readJSON(String json, Class<T> clazz) throws JSONException {
-        return readJSON(json, clazz, null);
+        return readJSON(json, clazz, null, true);
+    }
+
+    public static <T> T readJSON(String json, Class<T> clazz, boolean complete) throws JSONException {
+        return readJSON(json, clazz, null, complete);
     }
 
     public static <T> T readJSON(String json, Class<T> clazz, Type genericType) throws JSONException {
+        return readJSON(json, clazz, genericType, true);
+    }
+
+    public static <T> T readJSON(String json, Class<T> clazz, Type genericType, boolean complete) throws JSONException {
         ElementReference elementReference;
         StringArrayReference errorMessages;
         T t;
@@ -58,7 +66,7 @@ public class JSONReflectiveReader {
         boolean success = ReadJSON(json.toCharArray(), elementReference, errorMessages);
 
         if(success){
-            t = javaifyJSONValue(elementReference.element, clazz, genericType);
+            t = javaifyJSONValue(elementReference.element, clazz, genericType, complete);
         }else{
             throw new JSONException(join(errorMessages.stringArray, "\n"));
         }
@@ -78,6 +86,10 @@ public class JSONReflectiveReader {
     }
 
     public static <T> T javaifyJSONValue(Element element, Class<T> clazz, Type genericType) throws JSONException {
+        return javaifyJSONValue(element, clazz, genericType, true);
+    }
+
+    public static <T> T javaifyJSONValue(Element element, Class<T> clazz, Type genericType, boolean complete) throws JSONException {
         T t = null;
 
         String type = new String(element.type);
@@ -85,9 +97,9 @@ public class JSONReflectiveReader {
         if(type.equals("null")){
         }else{
             if (type.equals("object")) {
-                t = javaifyJSONObject(element.object, clazz);
+                t = javaifyJSONObject(element.object, clazz, complete);
             } else if (type.equals("array")) {
-                t = javaifyJSONArray(element.array, clazz, genericType);
+                t = javaifyJSONArray(element.array, clazz, genericType, complete);
             } else if (type.equals("string")) {
                 if(clazz == String.class){
                     t = (T)new String(element.string);
@@ -140,6 +152,10 @@ public class JSONReflectiveReader {
     public static String [] javaKeywords = new String [] {"abstract", "continue", "for", "new", "switch", "assert", "default", "goto", "package", "synchronized", "boolean", "do", "if", "private", "this", "break", "double", "implements", "protected", "throw", "byte", "else", "import", "public", "throws", "case", "enum", "instanceof", "return", "transient", "catch", "extends", "int", "short", "try", "char", "final", "interface", "static", "void", "class", "finally", "long", "strictfp", "volatile", "const", "float", "native", "super", "while"};
 
     public static <T> T javaifyJSONObject(StringElementMap object, Class<T> clazz) throws JSONException {
+        return javaifyJSONObject(object, clazz, true);
+    }
+
+    public static <T> T javaifyJSONObject(StringElementMap object, Class<T> clazz, boolean complete) throws JSONException {
         T t;
 
         try {
@@ -158,15 +174,34 @@ public class JSONReflectiveReader {
                     key = key + "x";
                 }
 
-                Field field = clazz.getField(key);
-                Object value = javaifyJSONValue(object.elementListRef.array[i], field.getType(), field.getGenericType());
-                field.set(t, value);
+                boolean setField;
+
+                if(complete) {
+                    setField = true;
+                }else{
+                    setField = ClassContainsField(clazz, key);
+                }
+
+                if(setField) {
+                    Field field = clazz.getField(key);
+                    Object value = javaifyJSONValue(object.elementListRef.array[i], field.getType(), field.getGenericType(), complete);
+                    field.set(t, value);
+                }
             } catch (NoSuchFieldException | IllegalAccessException e) {
                 throw new JSONException(e);
             }
         }
 
         return t;
+    }
+
+    public static boolean ClassContainsField(Class<?> clazz, String fieldName) {
+        for (Field field : clazz.getFields()) {
+            if (field.getName().equals(fieldName)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public static <T> List<T> ArrayToListConversion(T array[]) {
@@ -177,14 +212,14 @@ public class JSONReflectiveReader {
         return list;
     }
 
-    public static <T> T javaifyJSONArray(Element[] array, Class<T> clazz, Type genericType) throws JSONException {
+    public static <T> T javaifyJSONArray(Element[] array, Class<T> clazz, Type genericType, boolean complete) throws JSONException {
 
         Class<?> componentType = clazz.getComponentType();
         if(componentType != null){
             Object a[] = (Object[])Array.newInstance(componentType, array.length);
 
             for(int i = 0; i < array.length; i++){
-                a[i] = javaifyJSONValue(array[i], componentType, null);
+                a[i] = javaifyJSONValue(array[i], componentType, null, complete);
             }
 
             return (T)a;
@@ -204,7 +239,7 @@ public class JSONReflectiveReader {
 
 
             for(int i = 0; i < array.length; i++){
-                list.add(javaifyJSONValue(array[i], typeClass, typeGeneric));
+                list.add(javaifyJSONValue(array[i], typeClass, typeGeneric, complete));
             }
 
             return (T)list;

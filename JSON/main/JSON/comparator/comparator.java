@@ -4,13 +4,11 @@ import JSON.StringElementMaps.*;
 import JSON.structures.*;
 import references.references.*;
 
-import static JSON.StringElementMaps.StringElementMaps.GetObjectValueWithCheck;
-import static JSON.StringElementMaps.StringElementMaps.GetStringElementMapKeySet;
-import static JSON.StringElementMaps.StringElementMaps.GetStringElementMapNumberOfKeys;
-import static JSON.json.json.DeleteElement;
-import static JSON.parser.parser.ReadJSON;
-import static arrays.arrays.arrays.StringsEqual;
-import static math.math.math.EpsilonCompare;
+import static JSON.StringElementMaps.StringElementMaps.*;
+import static JSON.json.json.*;
+import static JSON.parser.parser.*;
+import static arrays.arrays.arrays.*;
+import static math.math.math.*;
 
 public class comparator {
     public static boolean JSONCompare(char [] a, char [] b, double epsilon, BooleanReference equal, StringArrayReference errorMessage){

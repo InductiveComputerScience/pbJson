@@ -1,6 +1,6 @@
 {
     "name": "JSON",
-    "version": "0.4.0",
+    "version": "0.4.2",
     "organization namespace": "no.inductive.idea10.programs",
     "scientific namespace": "computerscience.datastructures.interchange",
     "imports": [

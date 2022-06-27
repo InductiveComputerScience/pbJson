@@ -3,14 +3,12 @@ package JSON.writer;
 import JSON.structures.*;
 import references.references.*;
 
-import static JSON.StringElementMaps.StringElementMaps.GetObjectValue;
-import static JSON.StringElementMaps.StringElementMaps.GetStringElementMapKeySet;
-import static JSON.lengthComputer.lengthComputer.ComputeJSONStringLength;
+import static JSON.StringElementMaps.StringElementMaps.*;
+import static JSON.lengthComputer.lengthComputer.*;
 import static arrays.arrays.arrays.StringsEqual;
-import static java.lang.Math.abs;
-import static java.lang.Math.pow;
+import static java.lang.Math.*;
 import static nnumbers.NumberToString.NumberToString.*;
-import static references.references.references.CreateNumberReference;
+import static references.references.references.*;
 import static strstrings.stream.stream.strWriteCharacterToStingStream;
 import static strstrings.stream.stream.strWriteStringToStingStream;
 
