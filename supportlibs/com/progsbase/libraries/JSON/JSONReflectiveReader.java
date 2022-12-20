@@ -122,22 +122,22 @@ public class JSONReflectiveReader {
                 }
             } else if (type.equals("number")) {
                 if(clazz == Double.class || clazz == double.class){
-                    t = (T)new Double(element.number);
+                    t = (T)Double.valueOf(element.number);
                 }
                 if(clazz == Float.class || clazz == float.class){
-                    t = (T)new Float(element.number);
+                    t = (T)Float.valueOf((float)element.number);
                 }
                 if(clazz == Integer.class || clazz == int.class){
-                    t = (T)new Integer((int)Math.round(element.number));
+                    t = (T)Integer.valueOf((int)Math.round(element.number));
                 }
                 if(clazz == Long.class || clazz == long.class){
-                    t = (T)new Long(Math.round(element.number));
+                    t = (T)Long.valueOf(Math.round(element.number));
                 }
                 if(clazz == Short.class || clazz == short.class){
-                    t = (T)new Short((short)Math.round(element.number));
+                    t = (T)Short.valueOf((short)Math.round(element.number));
                 }
                 if(clazz == Byte.class || clazz == byte.class){
-                    t = (T)new Byte((byte)Math.round(element.number));
+                    t = (T)Byte.valueOf((byte)Math.round(element.number));
                 }
             } else if (type.equals("boolean")) {
                 if(clazz == Boolean.class || clazz == boolean.class){
