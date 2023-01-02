@@ -1,23 +1,20 @@
-package JSON.parser;
+package JSON.Parser;
 
-import JSON.LinkedListElements.Structures.*;
-import JSON.structures.*;
-import lists.LinkedListStrings.Structures.*;
+import DataStructures.Array.Structures.Data;
+import DataStructures.Array.Structures.DataReference;
 import references.references.*;
 
-import static JSON.LinkedListElements.LinkedListElementsFunctions.LinkedListElementsFunctions.*;
-import static JSON.json.json.*;
-import static JSON.tokenReader.tokenReader.*;
+import static DataStructures.Array.Structures.Structures.*;
+import static JSON.TokenReader.TokenReader.*;
 import static arrays.arrays.arrays.*;
 import static charCharacters.Characters.Characters.*;
-import static lists.LinkedListStrings.LinkedListStringsFunctions.LinkedListStringsFunctions.*;
 import static lists.StringList.StringList.*;
 import static nnumbers.StringToNumber.StringToNumber.*;
 import static references.references.references.*;
 import static strstrings.strings.strings.*;
 
-public class parser {
-    public static boolean ReadJSON(char[] string, ElementReference elementReference, StringArrayReference errorMessages) {
+public class Parser {
+    public static boolean ReadJSON(char[] string, DataReference dataReference, StringArrayReference errorMessages) {
         StringArrayReference tokenArrayReference;
         boolean success;
 
@@ -27,23 +24,23 @@ public class parser {
 
         if (success) {
             // Parse.
-            success = GetJSONValue(tokenArrayReference.stringArray, elementReference, errorMessages);
+            success = GetJSONValue(tokenArrayReference.stringArray, dataReference, errorMessages);
         }
 
         return success;
     }
 
-    public static boolean GetJSONValue(StringReference [] tokens, ElementReference elementReference, StringArrayReference errorMessages){
+    public static boolean GetJSONValue(StringReference [] tokens, DataReference dataReference, StringArrayReference errorMessages){
         NumberReference i;
         boolean success;
 
         i = CreateNumberReference(0d);
-        success = GetJSONValueRecursive(tokens, i, 0d, elementReference, errorMessages);
+        success = GetJSONValueRecursive(tokens, i, 0d, dataReference, errorMessages);
 
         return success;
     }
 
-    public static boolean GetJSONValueRecursive(StringReference [] tokens, NumberReference i, double depth, ElementReference elementReference, StringArrayReference errorMessages){
+    public static boolean GetJSONValueRecursive(StringReference [] tokens, NumberReference i, double depth, DataReference dataReference, StringArrayReference errorMessages){
         char [] str, substr, token;
         double stringToDecimalResult;
         boolean success;
@@ -52,25 +49,25 @@ public class parser {
         token = tokens[(int)i.numberValue].string;
 
         if(StringsEqual(token, "{".toCharArray())){
-            success = GetJSONObject(tokens, i, depth + 1d, elementReference, errorMessages);
+            success = GetJSONObject(tokens, i, depth + 1d, dataReference, errorMessages);
         }else if(StringsEqual(token, "[".toCharArray())){
-            success = GetJSONArray(tokens, i, depth + 1d, elementReference, errorMessages);
+            success = GetJSONArray(tokens, i, depth + 1d, dataReference, errorMessages);
         }else if(StringsEqual(token, "true".toCharArray())){
-            elementReference.element = CreateBooleanElement(true);
+            dataReference.data = CreateBooleanData(true);
             i.numberValue  = i.numberValue + 1d;
         }else if(StringsEqual(token, "false".toCharArray())){
-            elementReference.element = CreateBooleanElement(false);
+            dataReference.data = CreateBooleanData(false);
             i.numberValue  = i.numberValue + 1d;
         }else if(StringsEqual(token, "null".toCharArray())){
-            elementReference.element = CreateNullElement();
+            dataReference.data = CreateNoTypeData();
             i.numberValue  = i.numberValue + 1d;
         }else if(charIsNumber(token[0]) || token[0] == '-'){
             stringToDecimalResult = nCreateNumberFromDecimalString(token);
-            elementReference.element = CreateNumberElement(stringToDecimalResult);
+            dataReference.data = CreateNumberData(stringToDecimalResult);
             i.numberValue  = i.numberValue + 1d;
         }else if(token[0] == '\"'){
             substr = strSubstring(token, 1d, token.length - 1d);
-            elementReference.element = CreateStringElement(substr);
+            dataReference.data = CreateStringData(substr);
             i.numberValue  = i.numberValue + 1d;
         }else{
             str = "".toCharArray();
@@ -91,19 +88,15 @@ public class parser {
         return success;
     }
 
-    public static boolean GetJSONObject(StringReference [] tokens, NumberReference i, double depth, ElementReference elementReference, StringArrayReference errorMessages) {
-        Element element, value;
+    public static boolean GetJSONObject(StringReference [] tokens, NumberReference i, double depth, DataReference dataReference, StringArrayReference errorMessages) {
+        Data data, value;
         boolean done, success;
         char [] key, colon, comma, closeCurly;
         char [] keystring, str;
-        ElementReference valueReference;
-        LinkedListElements values;
-        LinkedListStrings keys;
+        DataReference valueReference;
 
-        keys = CreateLinkedListString();
-        values = CreateLinkedListElements();
-        element = CreateObjectElement(0d);
-        valueReference = new ElementReference();
+        data = CreateStructData();
+        valueReference = new DataReference();
         success = true;
         i.numberValue  = i.numberValue + 1d;
 
@@ -122,9 +115,9 @@ public class parser {
 
                         if (success) {
                             keystring = strSubstring(key, 1d, key.length - 1d);
-                            value = valueReference.element;
-                            LinkedListAddString(keys, keystring);
-                            LinkedListAddElement(values, value);
+                            value = valueReference.data;
+
+                            AddDataToStruct(data.structure, keystring, value);
 
                             comma = tokens[(int) i.numberValue].string;
                             if (StringsEqual(comma, ",".toCharArray())) {
@@ -157,11 +150,7 @@ public class parser {
 
             if (StringsEqual(closeCurly, "}".toCharArray())) {
                 // OK
-                delete(element.object.stringListRef.stringArray);
-                delete(element.object.elementListRef.array);
-                element.object.stringListRef.stringArray = LinkedListStringsToArray(keys);
-                element.object.elementListRef.array = LinkedListElementsToArray(values);
-                elementReference.element = element;
+                dataReference.data = data;
                 i.numberValue  = i.numberValue + 1d;
             } else {
                 AddStringRef(errorMessages, CreateStringReference("Expected close curly brackets at end of object value.".toCharArray()));
@@ -169,26 +158,22 @@ public class parser {
             }
         }
 
-        FreeLinkedListString(keys);
-        FreeLinkedListElements(values);
         delete(valueReference);
 
         return success;
     }
 
-    public static boolean GetJSONArray(StringReference [] tokens, NumberReference i, double depth, ElementReference elementReference, StringArrayReference errorMessages) {
-        Element element, value;
+    public static boolean GetJSONArray(StringReference [] tokens, NumberReference i, double depth, DataReference dataReference, StringArrayReference errorMessages) {
+        Data data, value;
         char [] nextToken, comma;
         boolean done, success;
-        ElementReference valueReference;
-        LinkedListElements elements;
+        DataReference valueReference;
 
-        elements = CreateLinkedListElements();
         i.numberValue  = i.numberValue + 1d;
 
-        valueReference = new ElementReference();
+        valueReference = new DataReference();
         success = true;
-        element = CreateArrayElement(0d);
+        data = CreateArrayData();
 
         nextToken = tokens[(int)i.numberValue].string;
 
@@ -198,8 +183,8 @@ public class parser {
                 success = GetJSONValueRecursive(tokens, i, depth, valueReference, errorMessages);
 
                 if(success){
-                    value = valueReference.element;
-                    LinkedListAddElement(elements, value);
+                    value = valueReference.data;
+                    AddDataToArray(data.array, value);
 
                     comma = tokens[(int) i.numberValue].string;
 
@@ -217,15 +202,12 @@ public class parser {
         if (StringsEqual(nextToken, "]".toCharArray())) {
             // OK
             i.numberValue = i.numberValue + 1d;
-            delete(element.array);
-            element.array = LinkedListElementsToArray(elements);
         } else {
             AddStringRef(errorMessages, CreateStringReference("Expected close square bracket at end of array.".toCharArray()));
             success = false;
         }
 
-        elementReference.element = element;
-        FreeLinkedListElements(elements);
+        dataReference.data = data;
         delete(valueReference);
 
         return success;

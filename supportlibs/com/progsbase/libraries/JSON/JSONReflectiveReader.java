@@ -1,15 +1,17 @@
 package com.progsbase.libraries.JSON;
 
-import JSON.StringElementMaps.StringElementMap;
-import JSON.structures.Element;
-import JSON.structures.ElementReference;
+import DataStructures.Array.Structures.Data;
+import DataStructures.Array.Structures.DataReference;
+import DataStructures.Array.Structures.Structure;
 import references.references.StringArrayReference;
 
 import java.lang.reflect.*;
 import java.util.*;
 
-import static JSON.StringElementMaps.StringElementMaps.GetStringElementMapNumberOfKeys;
-import static JSON.parser.parser.ReadJSON;
+import static DataStructures.Array.Arrays.Arrays.ArrayIndex;
+import static DataStructures.Array.Arrays.Arrays.ArrayLength;
+import static DataStructures.Array.Structures.Structures.*;
+import static JSON.Parser.Parser.ReadJSON;
 import static references.references.references.CreateStringArrayReferenceLengthValue;
 
 /*
@@ -55,18 +57,18 @@ public class JSONReflectiveReader {
     }
 
     public static <T> T readJSON(String json, Class<T> clazz, Type genericType, boolean complete) throws JSONException {
-        ElementReference elementReference;
+        DataReference elementReference;
         StringArrayReference errorMessages;
         T t;
 
         t = null;
-        elementReference = new ElementReference();
+        elementReference = new DataReference();
         errorMessages = CreateStringArrayReferenceLengthValue(0d, "".toCharArray());
 
         boolean success = ReadJSON(json.toCharArray(), elementReference, errorMessages);
 
         if(success){
-            t = javaifyJSONValue(elementReference.element, clazz, genericType, complete);
+            t = javaifyJSONValue(elementReference.data, clazz, genericType, complete);
         }else{
             throw new JSONException(join(errorMessages.stringArray, "\n"));
         }
@@ -85,27 +87,25 @@ public class JSONReflectiveReader {
         return joined.toString();
     }
 
-    public static <T> T javaifyJSONValue(Element element, Class<T> clazz, Type genericType) throws JSONException {
-        return javaifyJSONValue(element, clazz, genericType, true);
+    public static <T> T javaifyJSONValue(Data data, Class<T> clazz, Type genericType) throws JSONException {
+        return javaifyJSONValue(data, clazz, genericType, true);
     }
 
-    public static <T> T javaifyJSONValue(Element element, Class<T> clazz, Type genericType, boolean complete) throws JSONException {
+    public static <T> T javaifyJSONValue(Data data, Class<T> clazz, Type genericType, boolean complete) throws JSONException {
         T t = null;
 
-        String type = new String(element.type);
-
-        if(type.equals("null")){
+        if(IsNoType(data)){
         }else{
-            if (type.equals("object")) {
-                t = javaifyJSONObject(element.object, clazz, complete);
-            } else if (type.equals("array")) {
-                t = javaifyJSONArray(element.array, clazz, genericType, complete);
-            } else if (type.equals("string")) {
+            if (IsStructure(data)) {
+                t = javaifyJSONObject(data.structure, clazz, complete);
+            } else if (IsArray(data)) {
+                t = javaifyJSONArray(data.array, clazz, genericType, complete);
+            } else if (IsString(data)) {
                 if(clazz == String.class){
-                    t = (T)new String(element.string);
+                    t = (T)new String(data.string);
                 }
                 if(clazz.isArray() && clazz.getComponentType() == char.class){
-                    t = (T)element.string;
+                    t = (T)data.string;
                 }
                 if(clazz.isEnum()){
                     Method valueOf;
@@ -115,33 +115,33 @@ public class JSONReflectiveReader {
                         throw new JSONException(e.getMessage());
                     }
                     try {
-                        t = (T)valueOf.invoke(null, new String(element.string));
+                        t = (T)valueOf.invoke(null, new String(data.string));
                     } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
                         throw new JSONException(e.getMessage());
                     }
                 }
-            } else if (type.equals("number")) {
+            } else if (IsNumber(data)) {
                 if(clazz == Double.class || clazz == double.class){
-                    t = (T)Double.valueOf(element.number);
+                    t = (T)Double.valueOf(data.number);
                 }
                 if(clazz == Float.class || clazz == float.class){
-                    t = (T)Float.valueOf((float)element.number);
+                    t = (T)Float.valueOf((float)data.number);
                 }
                 if(clazz == Integer.class || clazz == int.class){
-                    t = (T)Integer.valueOf((int)Math.round(element.number));
+                    t = (T)Integer.valueOf((int)Math.round(data.number));
                 }
                 if(clazz == Long.class || clazz == long.class){
-                    t = (T)Long.valueOf(Math.round(element.number));
+                    t = (T)Long.valueOf(Math.round(data.number));
                 }
                 if(clazz == Short.class || clazz == short.class){
-                    t = (T)Short.valueOf((short)Math.round(element.number));
+                    t = (T)Short.valueOf((short)Math.round(data.number));
                 }
                 if(clazz == Byte.class || clazz == byte.class){
-                    t = (T)Byte.valueOf((byte)Math.round(element.number));
+                    t = (T)Byte.valueOf((byte)Math.round(data.number));
                 }
-            } else if (type.equals("boolean")) {
+            } else if (IsBoolean(data)) {
                 if(clazz == Boolean.class || clazz == boolean.class){
-                    t = (T)(Boolean)element.booleanValue;
+                    t = (T)(Boolean)data.booleanx;
                 }
             }
         }
@@ -151,12 +151,13 @@ public class JSONReflectiveReader {
 
     public static String [] javaKeywords = new String [] {"abstract", "continue", "for", "new", "switch", "assert", "default", "goto", "package", "synchronized", "boolean", "do", "if", "private", "this", "break", "double", "implements", "protected", "throw", "byte", "else", "import", "public", "throws", "case", "enum", "instanceof", "return", "transient", "catch", "extends", "int", "short", "try", "char", "final", "interface", "static", "void", "class", "finally", "long", "strictfp", "volatile", "const", "float", "native", "super", "while"};
 
-    public static <T> T javaifyJSONObject(StringElementMap object, Class<T> clazz) throws JSONException {
+    public static <T> T javaifyJSONObject(Structure object, Class<T> clazz) throws JSONException {
         return javaifyJSONObject(object, clazz, true);
     }
 
-    public static <T> T javaifyJSONObject(StringElementMap object, Class<T> clazz, boolean complete) throws JSONException {
+    public static <T> T javaifyJSONObject(Structure object, Class<T> clazz, boolean complete) throws JSONException {
         T t;
+        references.references.StringReference [] keys;
 
         try {
             t = clazz.newInstance();
@@ -164,9 +165,11 @@ public class JSONReflectiveReader {
             throw new JSONException(e);
         }
 
-        for(int i = 0; i < GetStringElementMapNumberOfKeys(object); i++){
+        keys = GetStructKeys(object);
+
+        for(int i = 0; i < keys.length; i++){
             try {
-                String key = new String(object.stringListRef.stringArray[i].string);
+                String key = new String(keys[i].string);
 
                 Set<String> kws = new HashSet<>(ArrayToListConversion(javaKeywords));
 
@@ -184,7 +187,7 @@ public class JSONReflectiveReader {
 
                 if(setField) {
                     Field field = clazz.getField(key);
-                    Object value = javaifyJSONValue(object.elementListRef.array[i], field.getType(), field.getGenericType(), complete);
+                    Object value = javaifyJSONValue(GetDataFromStruct(object, keys[i].string), field.getType(), field.getGenericType(), complete);
                     field.set(t, value);
                 }
             } catch (NoSuchFieldException | IllegalAccessException e) {
@@ -212,19 +215,19 @@ public class JSONReflectiveReader {
         return list;
     }
 
-    public static <T> T javaifyJSONArray(Element[] array, Class<T> clazz, Type genericType, boolean complete) throws JSONException {
+    public static <T> T javaifyJSONArray(DataStructures.Array.Structures.Array array, Class<T> clazz, Type genericType, boolean complete) throws JSONException {
 
         Class<?> componentType = clazz.getComponentType();
         if(componentType != null){
-            Object a[] = (Object[])Array.newInstance(componentType, array.length);
+            Object a[] = (Object[])Array.newInstance(componentType, (int)ArrayLength(array));
 
-            for(int i = 0; i < array.length; i++){
-                a[i] = javaifyJSONValue(array[i], componentType, null, complete);
+            for(int i = 0; i < ArrayLength(array); i++){
+                a[i] = javaifyJSONValue(ArrayIndex(array, i), componentType, null, complete);
             }
 
             return (T)a;
         }else{
-            List<Object> list = new ArrayList<>(array.length);
+            List<Object> list = new ArrayList<>((int)ArrayLength(array));
             ParameterizedType p = (ParameterizedType)genericType;
             Type type = p.getActualTypeArguments()[0];
             Class<?> typeClass;
@@ -239,7 +242,7 @@ public class JSONReflectiveReader {
 
 
             for(int i = 0; i < array.length; i++){
-                list.add(javaifyJSONValue(array[i], typeClass, typeGeneric, complete));
+                list.add(javaifyJSONValue(ArrayIndex(array, i), typeClass, typeGeneric, complete));
             }
 
             return (T)list;

@@ -1,4 +1,4 @@
-package JSON.tokenReader;
+package JSON.TokenReader;
 
 import lists.LinkedListStrings.Structures.*;
 import references.references.*;
@@ -11,7 +11,7 @@ import static nnumbers.StringToNumber.StringToNumber.*;
 import static references.references.references.*;
 import static strstrings.strings.strings.*;
 
-public class tokenReader {
+public class TokenReader {
     public static boolean JSONTokenize(char [] json, StringArrayReference tokensReference, StringArrayReference errorMessages) {
         double i;
         char c;

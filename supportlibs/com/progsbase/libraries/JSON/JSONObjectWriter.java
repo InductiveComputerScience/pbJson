@@ -1,13 +1,12 @@
 package com.progsbase.libraries.JSON;
 
-import JSON.structures.Element;
+import DataStructures.Array.Structures.Data;
 
 import java.util.List;
 import java.util.Map;
 
-import static JSON.StringElementMaps.StringElementMaps.SetStringElementMap;
-import static JSON.json.json.*;
-import static JSON.writer.writer.WriteJSON;
+import static DataStructures.Array.Structures.Structures.*;
+import static JSON.Writer.Writer.WriteJSON;
 
 /*
  This class writes a Java Object into a string with the following specs:
@@ -24,7 +23,7 @@ public class JSONObjectWriter {
         char[] value;
 
         try {
-            Element e = unjavaifyJSONValue(object);
+            Data e = unjavaifyJSONValue(object);
             value = WriteJSON(e);
         } catch (JSONException ex) {
             value = "".toCharArray();
@@ -34,7 +33,7 @@ public class JSONObjectWriter {
     }
 
     public static String writeJSONExceptionOnFailure(Object o) throws JSONException {
-        Element e = unjavaifyJSONValue(o);
+        Data e = unjavaifyJSONValue(o);
         char[] value = WriteJSON(e);
 
         return new String(value);
@@ -44,7 +43,7 @@ public class JSONObjectWriter {
         StringReturn stringReturn = new StringReturn();
 
         try {
-            Element e = unjavaifyJSONValue(o);
+            Data e = unjavaifyJSONValue(o);
             stringReturn.success = true;
             stringReturn.errorMessage = "";
             stringReturn.str = new String(WriteJSON(e));
@@ -57,11 +56,11 @@ public class JSONObjectWriter {
         return stringReturn;
     }
 
-    public static Element unjavaifyJSONValue(Object o) throws JSONException {
-        Element e;
+    public static Data unjavaifyJSONValue(Object o) throws JSONException {
+        Data e;
 
         if(o == null) {
-            e = CreateNullElement();
+            e = CreateNoTypeData();
         }else if(o instanceof Map) {
             e = unjavaifyJSONObject(o);
         }else if(o.getClass().isArray()) {
@@ -70,28 +69,28 @@ public class JSONObjectWriter {
             e = unjavaifyJSONArrayList(o);
         }else if(o instanceof String) {
             String s = (String)o;
-            e = CreateStringElement(s.toCharArray());
+            e = CreateStringData(s.toCharArray());
         }else if(o instanceof Double) {
             Double n = (Double)o;
-            e = CreateNumberElement(n);
+            e = CreateNumberData(n);
         }else if(o instanceof Float) {
             Float n = (Float)o;
-            e = CreateNumberElement(n);
+            e = CreateNumberData(n);
         }else if(o instanceof Integer) {
             Integer n = (Integer)o;
-            e = CreateNumberElement(n);
+            e = CreateNumberData(n);
         }else if(o instanceof Long) {
             Long n = (Long)o;
-            e = CreateNumberElement(n);
+            e = CreateNumberData(n);
         }else if(o instanceof Short) {
             Short n = (Short)o;
-            e = CreateNumberElement(n);
+            e = CreateNumberData(n);
         }else if(o instanceof Byte) {
             Byte n = (Byte)o;
-            e = CreateNumberElement(n);
+            e = CreateNumberData(n);
         }else if(o instanceof Boolean) {
             Boolean b = (Boolean)o;
-            e = CreateBooleanElement(b);
+            e = CreateBooleanData(b);
         }else{
             throw new JSONException("Cannot be converted to JSON structure: " + o.getClass());
         }
@@ -99,43 +98,41 @@ public class JSONObjectWriter {
         return e;
     }
 
-    public static Element unjavaifyJSONObject(Object o) throws JSONException {
+    public static Data unjavaifyJSONObject(Object o) throws JSONException {
         Map<String, Object> m = (Map)o;
-        Element e = CreateObjectElement(m.size());
+        Data e = CreateStructData();
         int i = 0;
 
         for(Map.Entry<String, Object> p : m.entrySet()){
-            Element s = unjavaifyJSONValue(p.getValue());
-            SetStringElementMap(e.object, i, p.getKey().toCharArray(), s);
+            Data s = unjavaifyJSONValue(p.getValue());
+            AddDataToStruct(e.structure, p.getKey().toCharArray(), s);
             i++;
         }
 
         return e;
     }
 
-    public static Element unjavaifyJSONArrayList(Object o) throws JSONException {
+    public static Data unjavaifyJSONArrayList(Object o) throws JSONException {
         List<Object> l = (List<Object>)o;
-        Element e = CreateArrayElement(l.size());
+        Data e = CreateArrayData();
         int i = 0;
 
         for(Object p : l){
-            Element s = unjavaifyJSONValue(p);
-            e.array[i] = s;
+            Data s = unjavaifyJSONValue(p);
+            AddDataToArray(e.array, s);
             i++;
         }
 
         return e;
     }
 
-    public static Element unjavaifyJSONArrayArray(Object o) throws JSONException {
+    public static Data unjavaifyJSONArrayArray(Object o) throws JSONException {
         Object a[] = (Object[])o;
-        Element e = CreateArrayElement(a.length);
-        int i = 0;
+        Data e = CreateArrayData();
 
         for(Object p : a){
-            Element s = unjavaifyJSONValue(p);
-            e.array[i] = s;
-            i++;
+            Data s = unjavaifyJSONValue(p);
+            AddDataToArray(e.array, s);
         }
 
         return e;

@@ -1,33 +1,32 @@
 package testReader;
 
-import JSON.structures.Element;
-import JSON.structures.ElementReference;
-import references.references.NumberReference;
-import references.references.StringArrayReference;
-import references.references.StringReference;
+import DataStructures.Array.Structures.Array;
+import DataStructures.Array.Structures.Data;
+import DataStructures.Array.Structures.DataReference;
+import references.references.*;
 
-import static JSON.StringElementMaps.StringElementMaps.GetObjectValue;
-import static JSON.parser.parser.ReadJSON;
-import static JSON.writer.writer.WriteJSON;
+import static DataStructures.Array.Arrays.Arrays.ArrayIndex;
+import static DataStructures.Array.Structures.Structures.GetDataFromStruct;
 import static references.references.references.CreateStringArrayReferenceLengthValue;
 import static references.references.references.CreateStringReference;
-import static strstrings.strings.strings.strAppendString;
-import static strstrings.strings.strings.strConcatenateString;
-import static testWriter.testWriter.createExampleJSON;
+import static strstrings.strings.strings.*;
+import static testWriter.testWriter.*;
+import static JSON.Writer.Writer.*;
+import static JSON.Parser.Parser.*;
 import static testing.testing.testing.AssertEquals;
 import static testing.testing.testing.AssertTrue;
 
 public class testReader {
     public static void testReader(NumberReference failures){
-        Element json;
+        Data json;
         char [] string, string2;
         StringArrayReference errorMessages;
-        ElementReference elementReference;
+        DataReference elementReference;
         boolean success;
 
         json = createExampleJSON();
         string = WriteJSON(json);
-        elementReference = new ElementReference();
+        elementReference = new DataReference();
 
         errorMessages = CreateStringArrayReferenceLengthValue(0d, "".toCharArray());
 
@@ -35,7 +34,7 @@ public class testReader {
         AssertTrue(success, failures);
 
         if(success) {
-            json = elementReference.element;
+            json = elementReference.data;
             string2 = WriteJSON(json);
 
             AssertEquals(string.length, string2.length, failures);
@@ -45,8 +44,8 @@ public class testReader {
     public static void test2(NumberReference failures){
         char [] string, string2;
         StringArrayReference errorMessages;
-        Element json;
-        ElementReference elementReference;
+        Data json;
+        DataReference elementReference;
         boolean success;
 
         string = strConcatenateString("{".toCharArray(), "\"name\":\"base64\",".toCharArray());
@@ -63,12 +62,12 @@ public class testReader {
         string = strAppendString(string, "}" .toCharArray());
 
         errorMessages = CreateStringArrayReferenceLengthValue(0d, "".toCharArray());
-        elementReference = new ElementReference();
+        elementReference = new DataReference();
         success = ReadJSON(string, elementReference, errorMessages);
         AssertTrue(success, failures);
 
         if(success) {
-            json = elementReference.element;
+            json = elementReference.data;
 
             string2 = WriteJSON(json);
 
@@ -79,11 +78,11 @@ public class testReader {
     public static void testReaderExample(NumberReference failures){
         char [] json;
         StringArrayReference errorMessages;
-        ElementReference elementReference;
+        DataReference elementReference;
         StringReference outputJSON;
 
         errorMessages = CreateStringArrayReferenceLengthValue(0d, "".toCharArray());
-        elementReference = new ElementReference();
+        elementReference = new DataReference();
         outputJSON = CreateStringReference("".toCharArray());
 
         json = "{\"a\":\"hi\",\"b\":[1.2, 0.1, 100],\"x\":{\"x1\":null,\"x2\":true,\"x3\":false}}".toCharArray();
@@ -91,11 +90,11 @@ public class testReader {
         JSONExample(json, errorMessages, elementReference, outputJSON);
     }
 
-    public static void JSONExample(char[] json, StringArrayReference errorMessages, ElementReference elementReference, StringReference outputJSON) {
+    public static void JSONExample(char[] json, StringArrayReference errorMessages, DataReference elementReference, StringReference outputJSON) {
         boolean success;
-        Element element, aElement;
+        Data element, aElement;
         char [] string;
-        Element array [];
+        Array array;
         double x, y, z;
 
         /* The following JSON is in the string json:
@@ -117,18 +116,18 @@ public class testReader {
         // if not, errorMessages contains the reason.
         if(success){
             // We can now extract the data structure:
-            element = elementReference.element;
+            element = elementReference.data;
 
             // The following is gets the value "hi" for key "a":
-            aElement = GetObjectValue(element.object, "a".toCharArray());
+            aElement = GetDataFromStruct(element.structure, "a".toCharArray());
             string = aElement.string;
 
             // The following is gets the array [1.2, 0.1, 100] for key "b":
-            aElement = GetObjectValue(element.object, "b".toCharArray());
+            aElement = GetDataFromStruct(element.structure, "b".toCharArray());
             array = aElement.array;
-            x = array[0].number;
-            y = array[1].number;
-            z = array[2].number;
+            x = ArrayIndex(array, 0d).number;
+            y = ArrayIndex(array, 1d).number;
+            z = ArrayIndex(array, 2d).number;
 
             // This is how you write JSON:
             outputJSON.string = WriteJSON(element);

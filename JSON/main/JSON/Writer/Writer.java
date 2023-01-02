@@ -1,54 +1,53 @@
-package JSON.writer;
+package JSON.Writer;
 
-import JSON.structures.*;
+import DataStructures.Array.Structures.*;
 import references.references.*;
 
-import static JSON.StringElementMaps.StringElementMaps.*;
-import static JSON.lengthComputer.lengthComputer.*;
-import static arrays.arrays.arrays.StringsEqual;
+import static DataStructures.Array.Arrays.Arrays.ArrayIndex;
+import static DataStructures.Array.Structures.Structures.*;
+import static JSON.LengthComputer.LengthComputer.*;
 import static java.lang.Math.*;
 import static nnumbers.NumberToString.NumberToString.*;
 import static references.references.references.*;
-import static strstrings.stream.stream.strWriteCharacterToStingStream;
-import static strstrings.stream.stream.strWriteStringToStingStream;
+import static strstrings.stream.stream.*;
 
-public class writer {
-    public static char[] WriteJSON(Element element) {
+public class Writer {
+    public static char[] WriteJSON(Data data) {
         char[] result;
         double length;
         NumberReference index;
 
-        length = ComputeJSONStringLength(element);
+        length = ComputeJSONStringLength(data);
         result = new char[(int)length];
         index = CreateNumberReference(0d);
 
-        if(StringsEqual(element.type, "object".toCharArray())){
-            WriteObject(element, result, index);
-        }else if(StringsEqual(element.type, "string".toCharArray())){
-            WriteString(element, result, index);
-        }else if(StringsEqual(element.type, "array".toCharArray())){
-            WriteArray(element, result, index);
-        }else if(StringsEqual(element.type, "number".toCharArray())){
-            WriteNumber(element, result, index);
-        }else if(StringsEqual(element.type, "null".toCharArray())){
+        if(IsStructure(data)){
+            WriteObject(data, result, index);
+        }else if(IsString(data)){
+            WriteString(data, result, index);
+        }else if(IsArray(data)){
+            WriteArray(data, result, index);
+        }else if(IsNumber(data)){
+            WriteNumber(data, result, index);
+        }else if(IsNoType(data)){
             strWriteStringToStingStream(result, index, "null".toCharArray());
-        }else if(StringsEqual(element.type, "boolean".toCharArray())){
-            WriteBooleanValue(element, result, index);
+        }else if(IsBoolean(data)){
+            WriteBooleanValue(data, result, index);
         }
 
         return result;
     }
 
-    public static void WriteBooleanValue(Element element, char[] result, NumberReference index) {
+    public static void WriteBooleanValue(Data element, char[] result, NumberReference index) {
 
-        if(element.booleanValue){
+        if(element.booleanx){
             strWriteStringToStingStream(result, index, "true".toCharArray());
         }else{
             strWriteStringToStingStream(result, index, "false".toCharArray());
         }
     }
 
-    public static void WriteNumber(Element element, char[] result, NumberReference index) {
+    public static void WriteNumber(Data element, char[] result, NumberReference index) {
         char[] numberString;
 
         if(element.number != 0d) {
@@ -66,20 +65,20 @@ public class writer {
         // delete(numberString); // TODO: Start using = null instead,
     }
 
-    public static void WriteArray(Element element, char[] result, NumberReference index) {
+    public static void WriteArray(Data data, char[] result, NumberReference index) {
         char [] s;
-        Element arrayElement;
+        Data entry;
         double i;
 
         strWriteStringToStingStream(result, index, "[".toCharArray());
 
-        for(i = 0; i < element.array.length; i = i + 1d){
-            arrayElement = element.array[(int)i];
+        for(i = 0; i < data.array.length; i = i + 1d){
+            entry = ArrayIndex(data.array, i);
 
-            s = WriteJSON(arrayElement);
+            s = WriteJSON(entry);
             strWriteStringToStingStream(result, index, s);
 
-            if(i + 1d != element.array.length){
+            if(i + 1d != data.array.length){
                 strWriteStringToStingStream(result, index, ",".toCharArray());
             }
         }
@@ -87,7 +86,7 @@ public class writer {
         strWriteStringToStingStream(result, index, "]".toCharArray());
     }
 
-    public static void WriteString(Element element, char[] result, NumberReference index) {
+    public static void WriteString(Data element, char[] result, NumberReference index) {
         strWriteStringToStingStream(result, index, "\"".toCharArray());
         element.string = JSONEscapeString(element.string);
         strWriteStringToStingStream(result, index, element.string);
@@ -240,29 +239,29 @@ public class writer {
         return mustBeEscaped;
     }
 
-    public static void WriteObject(Element element, char[] result, NumberReference index) {
-        char [] s, key;
+    public static void WriteObject(Data data, char[] result, NumberReference index) {
+        char [] s, key, escapedKey;
         double i;
-        StringArrayReference keys;
-        Element objectElement;
+        StringReference [] keys;
+        Data objectElement;
 
         strWriteStringToStingStream(result, index, "{".toCharArray());
 
-        keys = GetStringElementMapKeySet(element.object);
-        for(i = 0; i < keys.stringArray.length; i = i + 1d){
-            key = keys.stringArray[(int)i].string;
-            key = JSONEscapeString(key);
-            objectElement = GetObjectValue(element.object, key);
+        keys = GetStructKeys(data.structure);
+        for(i = 0; i < keys.length; i = i + 1d){
+            key = keys[(int)i].string;
+            objectElement = GetDataFromStruct(data.structure, key);
 
+            escapedKey = JSONEscapeString(key);
             strWriteStringToStingStream(result, index, "\"".toCharArray());
-            strWriteStringToStingStream(result, index, key);
+            strWriteStringToStingStream(result, index, escapedKey);
             strWriteStringToStingStream(result, index, "\"".toCharArray());
             strWriteStringToStingStream(result, index, ":".toCharArray());
 
             s = WriteJSON(objectElement);
             strWriteStringToStingStream(result, index, s);
 
-            if(i + 1d != keys.stringArray.length){
+            if(i + 1d != keys.length){
                 strWriteStringToStingStream(result, index, ",".toCharArray());
             }
         }

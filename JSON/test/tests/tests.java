@@ -4,14 +4,15 @@ import references.references.BooleanReference;
 import references.references.NumberReference;
 import references.references.StringArrayReference;
 
-import static JSON.comparator.comparator.JSONCompare;
-import static JSON.validator.validator.IsValidJSON;
-import static references.references.references.*;
+import static JSON.Comparator.Comparator.JSONCompare;
+import static JSON.Validator.Validator.IsValidJSON;
+import static references.references.references.CreateBooleanReference;
+import static references.references.references.CreateNumberReference;
+import static references.references.references.CreateStringArrayReferenceLengthValue;
 import static testEscaper.testEscaper.testEscaper;
 import static testReader.testReader.*;
-import static testTokenizer.testTokenizer.testTokenizer1;
-import static testWriter.testWriter.testWriter;
-import static testWriter.testWriter.testWriterEscape;
+import static testTokenizer.testTokenizer.*;
+import static testWriter.testWriter.*;
 import static testing.testing.testing.AssertFalse;
 import static testing.testing.testing.AssertTrue;
 
@@ -30,21 +31,27 @@ public class tests {
         testEscaper(failures);
         testValidator(failures);
         testComparator(failures);
+        testWriter2(failures);
+        testWriter3(failures);
 
         return failures.numberValue;
     }
 
     public static void testValidator(NumberReference failures) {
-        char [] a, b;
+        char [] a, b, c, d;
         StringArrayReference errorMessages;
 
         errorMessages = CreateStringArrayReferenceLengthValue(0d, "".toCharArray());
 
         a = "{\"a\":\"hi\",\"b\":[1.2, 0.1, 100],\"x\":{\"x1\":null,\"x2\":true,\"x3\":false}}".toCharArray();
         b = "{{}}]".toCharArray();
+        c = "".toCharArray();
+        d = "{".toCharArray();
 
         AssertTrue(IsValidJSON(a, errorMessages), failures);
         AssertFalse(IsValidJSON(b, errorMessages), failures);
+        AssertFalse(IsValidJSON(c, errorMessages), failures);
+        AssertFalse(IsValidJSON(d, errorMessages), failures);
     }
 
     public static void testComparator(NumberReference failures) {

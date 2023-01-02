@@ -1,15 +1,14 @@
 package com.progsbase.libraries.JSON;
 
-import JSON.structures.Element;
+import DataStructures.Array.Structures.Data;
 
 import java.lang.reflect.Field;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import static JSON.StringElementMaps.StringElementMaps.SetStringElementMap;
-import static JSON.json.json.*;
-import static JSON.writer.writer.WriteJSON;
+import static DataStructures.Array.Structures.Structures.*;
+import static JSON.Writer.Writer.WriteJSON;
 
 /*
  This class writes a Java Object JSON into a Java Object with the following actual classes:
@@ -40,20 +39,20 @@ public class JSONReflectiveWriter {
     public static <T> String writeJSON(T t) throws JSONException {
         char[] value;
 
-        Element e = unjavaifyJSONValue(t);
+        Data e = unjavaifyJSONValue(t);
         value = WriteJSON(e);
 
         return new String(value);
     }
 
-    public static <T> Element unjavaifyJSONValue(T t) throws JSONException {
-        Element e;
+    public static <T> Data unjavaifyJSONValue(T t) throws JSONException {
+        Data e;
 
         if(t == null) {
-            e = CreateNullElement();
+            e = CreateNoTypeData();
         }else if(t.getClass().isArray() && t.getClass().getComponentType() == char.class) {
             char [] s = (char[])t;
-            e = CreateStringElement(s);
+            e = CreateStringData(s);
         }else if(t.getClass().isArray()) {
             e = unjavaifyJSONArrayArray(t);
         }else if(t.getClass().isEnum()) {
@@ -62,28 +61,28 @@ public class JSONReflectiveWriter {
             e = unjavaifyJSONArrayList(t);
         }else if(t instanceof String) {
             String s = (String)t;
-            e = CreateStringElement(s.toCharArray());
+            e = CreateStringData(s.toCharArray());
         }else if(t instanceof Double) {
             Double n = (Double)t;
-            e = CreateNumberElement(n);
+            e = CreateNumberData(n);
         }else if(t instanceof Float) {
             Float n = (Float)t;
-            e = CreateNumberElement(n);
+            e = CreateNumberData(n);
         }else if(t instanceof Integer) {
             Integer n = (Integer)t;
-            e = CreateNumberElement(n);
+            e = CreateNumberData(n);
         }else if(t instanceof Long) {
             Long n = (Long)t;
-            e = CreateNumberElement(n);
+            e = CreateNumberData(n);
         }else if(t instanceof Short) {
             Short n = (Short)t;
-            e = CreateNumberElement(n);
+            e = CreateNumberData(n);
         }else if(t instanceof Byte) {
             Byte n = (Byte)t;
-            e = CreateNumberElement(n);
+            e = CreateNumberData(n);
         }else if(t instanceof Boolean) {
             Boolean b = (Boolean)t;
-            e = CreateBooleanElement(b);
+            e = CreateBooleanData(b);
         }else{
             e = unjavaifyJSONObject(t);
         }
@@ -91,17 +90,17 @@ public class JSONReflectiveWriter {
         return e;
     }
 
-    public static <T> Element unjavaifyJSONEnum(T t) {
-        return CreateStringElement(t.toString().toCharArray());
+    public static <T> Data unjavaifyJSONEnum(T t) {
+        return CreateStringData(t.toString().toCharArray());
     }
 
-    public static <T> Element unjavaifyJSONObject(T t) throws JSONException {
+    public static <T> Data unjavaifyJSONObject(T t) throws JSONException {
         Field[] fields = t.getClass().getFields();
-        Element e = CreateObjectElement(fields.length);
+        Data e = CreateStructData();
         int i = 0;
 
         for(Field f : fields){
-            Element s;
+            Data s;
             try {
                 s = unjavaifyJSONValue(f.get(t));
             } catch (IllegalAccessException ex) {
@@ -117,36 +116,34 @@ public class JSONReflectiveWriter {
                 }
             }
 
-            SetStringElementMap(e.object, i, key.toCharArray(), s);
+            AddDataToStruct(e.structure, key.toCharArray(), s);
             i++;
         }
 
         return e;
     }
 
-    public static Element unjavaifyJSONArrayList(Object o) throws JSONException {
+    public static Data unjavaifyJSONArrayList(Object o) throws JSONException {
         List<Object> l = (List<Object>)o;
-        Element e = CreateArrayElement(l.size());
+        Data e = CreateArrayData();
         int i = 0;
 
         for(Object p : l){
-            Element s = unjavaifyJSONValue(p);
-            e.array[i] = s;
+            Data s = unjavaifyJSONValue(p);
+            AddDataToArray(e.array, s);
             i++;
         }
 
         return e;
     }
 
-    public static Element unjavaifyJSONArrayArray(Object o) throws JSONException {
+    public static Data unjavaifyJSONArrayArray(Object o) throws JSONException {
         Object a[] = (Object[])o;
-        Element e = CreateArrayElement(a.length);
-        int i = 0;
+        Data e = CreateArrayData();
 
         for(Object p : a){
-            Element s = unjavaifyJSONValue(p);
-            e.array[i] = s;
-            i++;
+            Data s = unjavaifyJSONValue(p);
+            AddDataToArray(e.array, s);
         }
 
         return e;

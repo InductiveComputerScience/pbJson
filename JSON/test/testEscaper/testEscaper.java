@@ -2,10 +2,12 @@ package testEscaper;
 
 import references.references.NumberReference;
 
-import static JSON.writer.writer.JSONEscapeCharacter;
-import static JSON.writer.writer.JSONMustBeEscaped;
+import static JSON.Writer.Writer.JSONEscapeCharacter;
+import static JSON.Writer.Writer.JSONMustBeEscaped;
 import static references.references.references.CreateNumberReference;
-import static testing.testing.testing.*;
+import static testing.testing.testing.AssertEquals;
+import static testing.testing.testing.AssertStringEquals;
+import static testing.testing.testing.AssertTrue;
 
 public class testEscaper {
     public static void testEscaper(NumberReference failures){

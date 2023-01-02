@@ -1,13 +1,10 @@
 package testTokenizer;
 
-import references.references.NumberReference;
-import references.references.StringArrayReference;
-import references.references.StringReference;
+import references.references.*;
 
-import static JSON.tokenReader.tokenReader.*;
-import static references.references.references.CreateNumberReference;
-import static references.references.references.CreateStringArrayReferenceLengthValue;
-import static strstrings.strings.strings.strSplitByString;
+import static JSON.TokenReader.TokenReader.*;
+import static references.references.references.*;
+import static strstrings.strings.strings.*;
 import static testing.testing.testing.*;
 
 public class testTokenizer {

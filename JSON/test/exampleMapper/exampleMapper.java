@@ -1,47 +1,46 @@
 package exampleMapper;
 
-import JSON.StringElementMaps.StringElementMap;
-import JSON.structures.Element;
+import DataStructures.Array.Structures.*;
 
-import static JSON.StringElementMaps.StringElementMaps.GetObjectValue;
-import static arrays.arrays.arrays.StringsEqual;
+import static DataStructures.Array.Arrays.Arrays.*;
+import static DataStructures.Array.Structures.Structures.*;
 
 public class exampleMapper {
-    public static Example mapTo(Element root) {
+    public static Example mapTo(Data root) {
         Example example;
 
         example = new Example();
-        example.a = GetObjectValue(root.object, "a".toCharArray()).string;
-        example.b = mapbTo(GetObjectValue(root.object, "b".toCharArray()).array);
-        example.x = mapXTo(GetObjectValue(root.object, "x".toCharArray()).object);
+        example.a = GetDataFromStruct(root.structure, "a".toCharArray()).string;
+        example.b = mapbTo(GetDataFromStruct(root.structure, "b".toCharArray()).array);
+        example.x = mapXTo(GetDataFromStruct(root.structure, "x".toCharArray()).structure);
 
         return example;
     }
 
-    public static X mapXTo(StringElementMap object) {
+    public static X mapXTo(Structure object) {
         X x;
 
         x = new X();
 
-        if(StringsEqual(GetObjectValue(object, "x1".toCharArray()).type, "null".toCharArray())){
+        if(IsNoType(GetDataFromStruct(object, "x1".toCharArray()))){
             x.x1IsNull = true;
             x.x1 = "".toCharArray();
         }
 
-        x.x2 = GetObjectValue(object, "x2".toCharArray()).booleanValue;
-        x.x3 = GetObjectValue(object, "x3".toCharArray()).booleanValue;
+        x.x2 = GetDataFromStruct(object, "x2".toCharArray()).booleanx;
+        x.x3 = GetDataFromStruct(object, "x3".toCharArray()).booleanx;
 
         return x;
     }
 
-    public static double[] mapbTo(Element[] array) {
+    public static double[] mapbTo(Array array) {
         double [] b;
         double i;
 
-        b = new double[array.length];
+        b = new double[(int)ArrayLength(array)];
 
         for(i = 0; i < array.length; i = i + 1d){
-            b[(int)i] = array[(int)i].number;
+            b[(int)i] = ArrayIndex(array, i).number;
         }
 
         return b;

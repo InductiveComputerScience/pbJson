@@ -1,18 +1,18 @@
 package com.progsbase.libraries.JSON;
 
-import JSON.StringElementMaps.StringElementMap;
-import JSON.structures.Element;
-import JSON.structures.ElementReference;
-import references.references.StringArrayReference;
+import DataStructures.Array.Structures.*;
+import references.references.*;
+import references.references.StringReference;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static JSON.StringElementMaps.StringElementMaps.GetStringElementMapNumberOfKeys;
-import static JSON.parser.parser.ReadJSON;
-import static references.references.references.CreateStringArrayReferenceLengthValue;
+import static DataStructures.Array.Arrays.Arrays.ArrayIndex;
+import static DataStructures.Array.Structures.Structures.*;
+import static JSON.Parser.Parser.*;
+import static references.references.references.*;
 
 /*
  This class reads JSON into a Java Object with the following actual classes:
@@ -25,35 +25,35 @@ import static references.references.references.CreateStringArrayReferenceLengthV
  */
 public class JSONObjectReader {
     public static Object readJSON(String json){
-        ElementReference elementReference;
+        DataReference dataReference;
         StringArrayReference errorMessages;
         Object object;
 
         object = null;
-        elementReference = new ElementReference();
+        dataReference = new DataReference();
         errorMessages = CreateStringArrayReferenceLengthValue(0d, "".toCharArray());
 
-        boolean success = ReadJSON(json.toCharArray(), elementReference, errorMessages);
+        boolean success = ReadJSON(json.toCharArray(), dataReference, errorMessages);
 
         if(success){
-            object = javaifyJSONValue(elementReference.element);
+            object = javaifyJSONValue(dataReference.data);
         }
 
         return object;
     }
 
     public static Object readJSONExceptionOnFailure(String json) throws JSONException {
-        ElementReference elementReference;
+        DataReference dataReference;
         StringArrayReference errorMessages;
         Object object;
 
-        elementReference = new ElementReference();
+        dataReference = new DataReference();
         errorMessages = CreateStringArrayReferenceLengthValue(0d, "".toCharArray());
 
-        boolean success = ReadJSON(json.toCharArray(), elementReference, errorMessages);
+        boolean success = ReadJSON(json.toCharArray(), dataReference, errorMessages);
 
         if(success){
-            object = javaifyJSONValue(elementReference.element);
+            object = javaifyJSONValue(dataReference.data);
         }else{
             String errorMessage = joinErrorMessages(errorMessages);
 
@@ -77,19 +77,19 @@ public class JSONObjectReader {
     }
 
     public static JSONReturn readJSONWithCheck(String json) {
-        ElementReference elementReference;
+        DataReference dataReference;
         StringArrayReference errorMessages;
         Object object;
 
         object = null;
         JSONReturn jsonReturn = new JSONReturn();
-        elementReference = new ElementReference();
+        dataReference = new DataReference();
         errorMessages = CreateStringArrayReferenceLengthValue(0d, "".toCharArray());
 
-        boolean success = ReadJSON(json.toCharArray(), elementReference, errorMessages);
+        boolean success = ReadJSON(json.toCharArray(), dataReference, errorMessages);
 
         if(success){
-            object = javaifyJSONValue(elementReference.element);
+            object = javaifyJSONValue(dataReference.data);
         }else{
             jsonReturn.errorMessage = joinErrorMessages(errorMessages);
         }
@@ -100,45 +100,45 @@ public class JSONObjectReader {
         return jsonReturn;
     }
 
-    public static Object javaifyJSONValue(Element element) {
+    public static Object javaifyJSONValue(Data data) {
         Object o;
 
         o = null;
 
-        String type = new String(element.type);
-
-        if(type.equals("object")){
-            o = javaifyJSONObject(element.object);
-        }else if(type.equals("array")){
-            o = javaifyJSONArray(element.array);
-        }else if(type.equals("string")){
-            o = new String(element.string);
-        }else if(type.equals("number")){
-            o = element.number;
-        }else if(type.equals("boolean")){
-            o = element.booleanValue;
-        }else if(type.equals("null")){
+        if(IsStructure(data)){
+            o = javaifyJSONObject(data.structure);
+        }else if(IsArray(data)){
+            o = javaifyJSONArray(data.array);
+        }else if(IsString(data)){
+            o = new String(data.string);
+        }else if(IsNumber(data)){
+            o = data.number;
+        }else if(IsBoolean(data)){
+            o = data.booleanx;
+        }else if(IsNoType(data)){
             o = null;
         }
 
         return o;
     }
 
-    public static Object javaifyJSONObject(StringElementMap object) {
+    public static Object javaifyJSONObject(Structure object) {
         Map<String, Object> resultObject = new HashMap<>();
 
-        for(int i = 0; i < GetStringElementMapNumberOfKeys(object); i++){
-            resultObject.put(new String(object.stringListRef.stringArray[i].string), javaifyJSONValue(object.elementListRef.array[i]));
+        StringReference[] keys = GetStructKeys(object);
+
+        for(int i = 0; i < keys.length; i++){
+            resultObject.put(new String(keys[i].string), javaifyJSONValue(GetDataFromStruct(object, keys[i].string)));
         }
 
         return resultObject;
     }
 
-    public static Object javaifyJSONArray(Element[] array) {
+    public static Object javaifyJSONArray(Array array) {
         List<Object> resultArray = new ArrayList<>();
 
         for(int i = 0; i < array.length; i++){
-            resultArray.add(javaifyJSONValue(array[i]));
+            resultArray.add(javaifyJSONValue(ArrayIndex(array, i)));
         }
 
         return resultArray;
